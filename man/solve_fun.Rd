@@ -4,16 +4,15 @@
 \alias{solve_fun}
 \title{Solve PK Model Through deSolve Package or Analytical Function}
 \usage{
-solve_fun(x, time = NULL, params, initParmsfun = NULL, initState,
-  dllname, func, initfunc, outnames, method = "lsode", rtol = 1e-08,
-  atol = 1e-12, model = NULL, lnparam = F, vars, ...)
+solve_fun(x, time = NULL, initParmsfun = "initParms", initState,
+  dllname, func = "derivs", initfunc = "initmod", outnames,
+  method = "lsode", rtol = 1e-08, atol = 1e-12, model = NULL,
+  lnparam = F, vars = NULL, ...)
 }
 \arguments{
 \item{x}{a list of storing information in the defined sensitivity function.}
 
 \item{time}{a vector to define the given time sequence.}
-
-\item{params}{parameters passed to \code{func}.}
 
 \item{initParmsfun}{a character for the given specific initial parameter function.}
 
@@ -65,6 +64,10 @@ through the imported deSolve function. It can be used to solve the function with
 
 }
 \references{
+S. Karline, T. Petzoldt and R. Setzer. 2010.
+Solving Differential Equations in R: Package deSolve.
+\emph{Journal of Statistical Software}, 33(9), 1–25.
+
 K. Soetaert, T. Petzoldt, R.W. Setzer, 2010, Solving differential equations in R: package deSolve,
 \emph{J. Stat. Soft.}, 33:9
 }

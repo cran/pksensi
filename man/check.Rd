@@ -9,9 +9,9 @@
 \usage{
 check(x, times, vars, SI.cutoff, CI.cutoff)
 
-heat_check(x, order = c("first order", "total order"), vars = NULL,
-  times = NULL, SI.cutoff = c(0.05, 0.1), CI.cutoff = c(0.05, 0.1),
-  index = "SI", level = T, text = F)
+heat_check(x, order = c("first order", "interaction", "total order"),
+  vars = NULL, times = NULL, SI.cutoff = c(0.05, 0.1),
+  CI.cutoff = c(0.05, 0.1), index = "SI", level = T, text = F)
 
 \method{plot}{rfast99}(x, vars = 1, SI.cutoff = 0.1, ...)
 
@@ -59,7 +59,7 @@ by Sarrazin et al. (2016).
 This method quantitatively assesses the convergence by computing the range of
 95% confidence intervals of the sensitivity indices for each parameter across all data points (time and outputs).
 Using a global approach based on a heatmap visualization combined with an index "cut-off,"
-can systematically distinguish between "influential" and "non-influential" parameters (Hsieh et al., 2018).
+can systematically distinguish between "influential" and "non-influential" parameters (Hsieh et al. 2018).
 }
 \examples{
 q <- "qunif"

@@ -5,13 +5,13 @@
 \alias{generate_infile}
 \title{Solve PK Model Through MCSim}
 \usage{
-solve_mcsim(x, mName, infile.name, outfile.name, n = NULL,
-  setpoint.name = NULL, params = NULL, vars = NULL, time = NULL,
-  condition = NULL)
+solve_mcsim(x, mName, infile.name = NULL, outfile.name = NULL,
+  n = NULL, setpoint.name = NULL, params = NULL, vars = NULL,
+  time = NULL, condition = NULL, generate.infile = T)
 
-generate_infile(infile.name, outfile.name, params, vars, time, condition,
-  rtol = 1e-06, atol = 1e-09, n = NULL, dist = NULL,
-  q.arg = NULL)
+generate_infile(infile.name = NULL, outfile.name = NULL, params, vars,
+  time, condition, rtol = 1e-06, atol = 1e-09, n = NULL,
+  dist = NULL, q.arg = NULL)
 }
 \arguments{
 \item{x}{a list of storing information in the defined sensitivity function.}
@@ -33,6 +33,8 @@ generate_infile(infile.name, outfile.name, params, vars, time, condition,
 \item{time}{a numeric to define the given time point(s).}
 
 \item{condition}{a character to set the specific parameter value in the input file.}
+
+\item{generate.infile}{a logical value to automatically generate the input file, .}
 
 \item{rtol}{an argument passed to the integrator (default 1e-6).}
 
@@ -62,35 +64,32 @@ If you want to use it, be sure to define \code{n} and \code{setpoint.name}.
 }}
 
 \examples{
+
 \dontrun{
-url <- "https://raw.githubusercontent.com/nanhung/pksensi/master/tests/1cpt.model"
-destfile <- paste0(getwd(),"/1cpt.model")
-download.file(url, destfile)
-mName <- "1cpt"
+pbtk1cpt_model()
+mName <- "pbtk1cpt"
 compile_model(mName)
 
 q <- "qunif"
-q.arg <- list(list(min = 0.6, max = 1.0),
-   list(min = 0.5, max = 1.5),
-   list(min = 0.02, max = 0.3),
-   list(min = 20, max = 60))
+q.arg <- list(list(min = 0.4, max = 1.1),
+              list(min = 0.1, max = 0.4),
+              list(min = 1.0, max = 3.0))
 
-params <- c("Fgutabs","k_a","k_e","V_dist")
+params <- c("vdist", "ke", "kgutabs")
 
 set.seed(1234)
 x <- rfast99(params = params, n = 200, q = q, q.arg = q.arg, rep = 20)
 
 infile.name <- "example.in"
 outfile.name <- "example.csv"
-vars <- "C_rest"
+vars <- "Ccompartment"
 
 t <- seq(from = 0.25, to = 12.25, by = 0.5)
 
 y <- solve_mcsim(x, mName = mName, infile.name = infile.name,
-setpoint.name = "setpoint.dat",
-outfile.name = outfile.name, params = params, vars = vars, time = t,
-condition = "IngDose = 1")
-
+                 setpoint.name = "setpoint.dat",
+                 outfile.name = outfile.name, params = params, vars = vars, time = t,
+                 condition = "Agutlument = 10")
 pksim(y)
 }
 

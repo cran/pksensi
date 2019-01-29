@@ -1,23 +1,26 @@
 #' Install MCSim
 #'
-#' Download the latest or specific version of MCSim from the official website
+#' Download the latest or specific version of GNU MCSim from the official website
 #' (\url{https://www.gnu.org/software/mcsim/}) and install it to the system directory.
 #'
-#' This function aims to help users install MCSim more easily.
+#' This function aims to help users install GNU MCSim more easily.
 #' However, if you can not install it through this function.
-#' You might need to follow the instruction of MCSim and install it,
+#' You might need to follow the instruction of GNU MCSim and install it,
 #' manually: \url{https://www.gnu.org/software/mcsim/mcsim.html#Installation}
 #'
 #' The default \code{mxstp} is setting to 500.
 #' The user can increase \code{mxstp} to avoid possible error return.
-#' If you meet any error when conduct sensitivity analysis, you can this function to reinstall MCSim and set the higher \code{mxstp}.
+#' If you meet any error when conduct sensitivity analysis, you can this function to reinstall GNU MCSim and set the higher \code{mxstp}.
 #' The default \code{directory} to install MCSim is under \code{/home/username} (Linux), \code{/Users/username} (MacOS),
-#' and \code{C:/Users/} (windows).
+#' and \code{C:/Users/} (windows). To install MCSim in Windows, be sure to install Rtools or MinGW first.
 #'
-#' To install MCSim in Windows, be sure to install Rtools or MinGW first.
+#' @references
+#' F.Y. Bois, and D. Maszle, 1997,
+#' MCSim: A Monte Carlo Simulation Program,
+#' \emph{Journal of Statistical Software}, 2(9): 1–60.
 #'
 #' @param version a character of MCSim version number.
-#' @param directory a character to assign the directory to put the MCSim files.
+#' @param directory a character to assign the directory to put the GNU MCSim files.
 #' @param mxstep a numeric value to assign the maximum number of (internally defined) steps
 #' allowed during one call to the solver.
 #'
@@ -25,12 +28,14 @@
 #' @importFrom utils download.file
 #'
 #' @examples
-#' \dontrun{install_mcsim(version = 6.0.1, mxstep = 10000)}
+#' \dontrun{mcsim_install(version = 6.0.1, mxstep = 10000)}
 #'
 #' @references \url{https://www.gnu.org/software/mcsim/}
 #'
+#' @rdname mcsim
+#'
 #' @export
-install_mcsim = function(version = "6.0.1", directory = NULL, mxstep = 500) {
+mcsim_install <- function(version = "6.0.1", directory = NULL, mxstep = 500) {
 
 #  if (.Platform$OS.type == "windows") {
 #    stop("The function haven't supprot Windows system")
@@ -109,6 +114,16 @@ install_mcsim = function(version = "6.0.1", directory = NULL, mxstep = 500) {
   message(paste0("The MCSim " , sprintf('%s', version), " is installed. The sourced folder is under ", mcsim.directory))
   setwd(current.wd)
 
+}
+
+#' @export
+#' @describeIn mcsim Return the version number of GNU MCSim.
+mcsim_version <- function(){
+  invisible(system("mod -h | tee mod.mcsim.txt", intern = TRUE))
+  l <- readLines("mod.mcsim.txt")
+  invisible(file.remove("mod.mcsim.txt"))
+  version <- substr(l[4], 6, 10)
+  message("The current GNU MCSim version is ", version)
 }
 
 generate_config.h <- function(){

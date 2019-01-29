@@ -5,7 +5,6 @@
 #'
 #' @param x a list of storing information in the defined sensitivity function.
 #' @param time a vector to define the given time sequence.
-#' @param params parameters passed to \code{func}.
 #' @param initParmsfun a character for the given specific initial parameter function.
 #' @param initState a vector that define the initial values of state variables for the ODE system.
 #' @param dllname a string giving the name of the shared library (without extension)
@@ -20,6 +19,11 @@
 #' @param lnparam a logical value that make the statement of the log-transformed parameter (default FALSE).
 #' @param vars a character for the selected output.
 #' @param ... additional arguments for deSolve::ode method.
+#'
+#' @references
+#' S. Karline, T. Petzoldt and R. Setzer. 2010.
+#' Solving Differential Equations in R: Package deSolve.
+#' \emph{Journal of Statistical Software}, 33(9), 1–25.
 #'
 #' @examples
 #'   q <- "qunif"
@@ -45,14 +49,17 @@
 #' \emph{J. Stat. Soft.}, 33:9
 #'
 #' @export
-solve_fun <- function(x, time = NULL, params, initParmsfun = NULL, initState, dllname,
-                      func, initfunc, outnames,
+solve_fun <- function(x, time = NULL, initParmsfun = "initParms", initState, dllname,
+                      func = "derivs", initfunc = "initmod", outnames,
                       method ="lsode", rtol=1e-8, atol=1e-12,
-                      model = NULL, lnparam = F, vars, ...){
+                      model = NULL, lnparam = F, vars = NULL, ...){
   n <- length(x$s)
   no.params <- ifelse (class(x$params) == "character", length(x$params), x$params)
   replicate <- x$rep
   out <- ifelse (is.null(time), 1, length(time))
+
+  if (is.null(vars)) vars <- outnames
+
   n.vars <- length(vars)
   y <- array(dim = c(n * no.params, replicate, out, n.vars), NA)
   # c(Model Evaluations, replicates, time points, n.vars)
@@ -61,6 +68,9 @@ solve_fun <- function(x, time = NULL, params, initParmsfun = NULL, initState, dl
 
     # Specific time or variable
     inputs = c(0, time) # NEED TIME AT ZERO
+
+    params <- rep(0, length(x$params))
+    names(params) <- x$params
 
     for (i in 1 : dim(y)[2]) { # replicate
       for (j in 1 : dim(y)[1]) { # Model evaluation

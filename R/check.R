@@ -7,7 +7,7 @@
 #' This method quantitatively assesses the convergence by computing the range of
 #' 95% confidence intervals of the sensitivity indices for each parameter across all data points (time and outputs).
 #' Using a global approach based on a heatmap visualization combined with an index "cut-off,"
-#' can systematically distinguish between "influential" and "non-influential" parameters (Hsieh et al., 2018).
+#' can systematically distinguish between "influential" and "non-influential" parameters (Hsieh et al. 2018).
 #'
 #' @param x a list of storing information in the defined sensitivity function.
 #' @param order a vector of interested output index included \code{first order}, \code{interaction}, and \code{total order}.
@@ -153,7 +153,8 @@ check.rfast99 <- function(x, times = NULL, vars = NULL, SI.cutoff = 0.05, CI.cut
 
 #' @rdname check
 #' @export
-heat_check <- function(x, order = c("first order", "total order"),
+heat_check <- function(x,
+                       order = c("first order", "interaction", "total order"),
                        vars = NULL, times = NULL,
                        SI.cutoff = c(0.05, 0.1), CI.cutoff = c(0.05, 0.1),
                        index = "SI", level = T, text = F){
@@ -201,7 +202,8 @@ heat_check <- function(x, order = c("first order", "total order"),
     times <- dimnames(x$y)[[3]]
   } else (times <- times)
 
-  X <- X %>% filter(order %in% order) %>% filter_(~variable %in% vars) %>% filter(time %in% times)
+
+  X <- X %>% filter(order %in% !!(order)) %>% filter_(~variable %in% vars) %>% filter(time %in% times)
 
   if(length(times) < 10){
     X$time <- as.factor(X$time)
@@ -340,7 +342,7 @@ print.rfast99 <- function(x, ...) {
     cat("\ntotal order:", "\n")
     print(round(x$tSI, digits = digits))
 
-    if (x$rep > 1){ # without replication
+    if (x$rep > 1){ # w/ replication
       cat("\n")
       cat("\n=================================")
       cat("\nConvergence Indices", "\n")

@@ -20,6 +20,7 @@
 #' @param condition a character to set the specific parameter value in the input file.
 #' @param rtol an argument passed to the integrator (default 1e-6).
 #' @param atol an argument passed to the integrator (default 1e-9).
+#' @param generate.infile a logical value to automatically generate the input file, .
 #'
 #' @importFrom utils write.table
 #' @importFrom data.table fread
@@ -28,50 +29,52 @@
 #' c(model evaluations, replications, time-points, output variables).
 #'
 #' @examples
+#'
 #' \dontrun{
-#' url <- "https://raw.githubusercontent.com/nanhung/pksensi/master/tests/1cpt.model"
-#' destfile <- paste0(getwd(),"/1cpt.model")
-#' download.file(url, destfile)
-#' mName <- "1cpt"
+#' pbtk1cpt_model()
+#' mName <- "pbtk1cpt"
 #' compile_model(mName)
 #'
 #' q <- "qunif"
-#' q.arg <- list(list(min = 0.6, max = 1.0),
-#'    list(min = 0.5, max = 1.5),
-#'    list(min = 0.02, max = 0.3),
-#'    list(min = 20, max = 60))
+#' q.arg <- list(list(min = 0.4, max = 1.1),
+#'               list(min = 0.1, max = 0.4),
+#'               list(min = 1.0, max = 3.0))
 #'
-#' params <- c("Fgutabs","k_a","k_e","V_dist")
+#' params <- c("vdist", "ke", "kgutabs")
 #'
 #' set.seed(1234)
 #' x <- rfast99(params = params, n = 200, q = q, q.arg = q.arg, rep = 20)
 #'
 #' infile.name <- "example.in"
 #' outfile.name <- "example.csv"
-#' vars <- "C_rest"
+#' vars <- "Ccompartment"
 #'
 #' t <- seq(from = 0.25, to = 12.25, by = 0.5)
 #'
 #' y <- solve_mcsim(x, mName = mName, infile.name = infile.name,
-#' setpoint.name = "setpoint.dat",
-#' outfile.name = outfile.name, params = params, vars = vars, time = t,
-#' condition = "IngDose = 1")
-#'
+#'                  setpoint.name = "setpoint.dat",
+#'                  outfile.name = outfile.name, params = params, vars = vars, time = t,
+#'                  condition = "Agutlument = 10")
 #' pksim(y)
 #' }
 #'
 #' @export
 #' @describeIn solve_mcsim Numerical analysis for the PK model by MCSim.
-solve_mcsim <- function(x, mName, infile.name,
-                        outfile.name,
+solve_mcsim <- function(x, mName,
+                        infile.name = NULL,
+                        outfile.name = NULL,
                         n = NULL,
                         setpoint.name = NULL,
                         params = NULL,
                         vars  = NULL,
                         time  = NULL,
-                        condition  = NULL){
+                        condition  = NULL,
+                        generate.infile = T){
 
-  if(!is.null(condition)){ # Generate input file if not define condition
+  if(is.null(infile.name)) infile.name <- "input.in"
+  if(is.null(outfile.name)) outfile.name <- "output.csv"
+
+  if(generate.infile == T){
     generate_infile(infile.name = infile.name,
                     outfile.name = outfile.name,
                     params = params,
@@ -89,9 +92,9 @@ solve_mcsim <- function(x, mName, infile.name,
   } else setpoint.data <- setpoint.name
 
   mcsim. <- paste0("mcsim.", mName)
-  if(file.exists(mcsim.) == F){
-    stop(paste0("The ", "mcsim.", mName, " doesn't exist."))
-  }
+  #if(file.exists(mcsim.) == F){
+  #  stop(paste0("The ", "mcsim.", mName, " doesn't exist."))
+  #}
 
   #
   if (is.numeric(n)){
@@ -159,20 +162,29 @@ solve_mcsim <- function(x, mName, infile.name,
 
 #' @export
 #' @describeIn solve_mcsim Generate the MCSim input file.
-generate_infile <- function(infile.name, outfile.name, params, vars, time,
+generate_infile <- function(infile.name = NULL,
+                            outfile.name = NULL,
+                            params, vars, time,
                             condition, rtol = 1e-6, atol = 1e-9,
                             n = NULL, dist = NULL, q.arg = NULL){ # Monte Carlo
 
+  if(is.null(infile.name)) infile.name <- "input.in"
+  if(is.null(outfile.name)) outfile.name <- "output.csv"
   setpoint.data <- "setpoint.dat"
+
+  #if(file.exists(paste0(infile.name)) == T){
+  #  if(menu(c("Yes", "No"),
+  #          title=paste('The "', infile.name, '" is exist. Do you want to replace it?', sep ="")) == 2){
+  #    stop()
+  #  }
+  #}
 
   cat("#---------------------------------------- \n#",
       " ", infile.name , "\n#",
       " (Created by generate_infile)\n#",
       "----------------------------------------", "\n\n",
       file = infile.name, sep = "")
-
   cat("Integrate (Lsodes, ", rtol, ", ", atol, " , 1);", "\n\n", file=infile.name, append=TRUE, sep="")
-
   if(is.null(n)){
     cat("SetPoints (", "\n",
         "\"", outfile.name, "\", \n\"", setpoint.data, "\",\n",
@@ -186,28 +198,21 @@ generate_infile <- function(infile.name, outfile.name, params, vars, time,
       cat("Distrib ( ", params[i], ",", dist[i], ",", paste(unlist(q.arg[i]), collapse = ","), ");", "\n",
           file = infile.name, append=TRUE, sep = "")
     }
-
   }
-
   cat("\n#---------------------------------------- \n#",
       " Simulation scenario\n#",
       "----------------------------------------", "\n\n",
       file = infile.name, append = TRUE, sep = "")
-
   cat("Simulation {", "\n\n", file = infile.name, append = TRUE)
-
   # cat(paste(conditions, collapse=";"), ";", "\n\n", file = infile.name, append=TRUE, sep = "")
-
   for (i in 1 : length(condition)){
     cat(paste(condition[i], collapse = ";"), ";", "\n", file = infile.name, append = TRUE, sep = "")
   }
-
   cat("\n", file = infile.name, append = TRUE)
-
   for (i in 1 : length(vars)) {
     cat("Print (", paste(vars[i], collapse = ", "), ", ", paste(time, collapse=", "), ");\n",
         file = infile.name, append=TRUE, sep = "")
   }
-
   cat("}", "END.", file = infile.name, append = TRUE)
+  message(paste('* Created input file "', infile.name, '".', sep =""))
 }
