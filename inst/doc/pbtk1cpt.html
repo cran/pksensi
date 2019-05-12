@@ -12,7 +12,7 @@
 
 <meta name="author" content="Nan-Hung Hsieh" />
 
-<meta name="date" content="2019-01-29" />
+<meta name="date" content="2019-05-12" />
 
 <title>One-compartment PBTK model</title>
 
@@ -291,6 +291,9 @@ code > span.al { color: #ff0000; font-weight: bold; }
 code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
+
+
+
 </head>
 
 <body>
@@ -299,8 +302,8 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 
 <h1 class="title toc-ignore">One-compartment PBTK model</h1>
-<h4 class="author"><em>Nan-Hung Hsieh</em></h4>
-<h4 class="date"><em>2019-01-29</em></h4>
+<h4 class="author">Nan-Hung Hsieh</h4>
+<h4 class="date">2019-05-12</h4>
 
 
 
@@ -348,32 +351,31 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb9-8" title="8">params &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;vdist&quot;</span>, <span class="st">&quot;ke&quot;</span>, <span class="st">&quot;kgutabs&quot;</span>)</a>
 <a class="sourceLine" id="cb9-9" title="9">x &lt;-<span class="st"> </span><span class="kw">rfast99</span>(params, <span class="dt">n =</span> <span class="dv">200</span>, <span class="dt">q =</span> q, <span class="dt">q.arg =</span> q.arg, <span class="dt">replicate =</span> <span class="dv">20</span>)</a></code></pre></div>
 <p>Because the pharmacokinetic model is being used to describe a continuous process for the chemical concentration over time, the sensitivity measurements can also show the time-dependent relationships for each model parameter. Here we define the output time points to examine the change of the parameter sensitivity over time. To solve the pharmacokinetic model through deSolve, we need to provide the details of the argument:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">y &lt;-<span class="st"> </span><span class="kw">solve_fun</span>(x, times, <span class="dt">initState =</span> initState, <span class="dt">outnames =</span> Outputs, <span class="dt">dllname =</span> mName)</a>
-<a class="sourceLine" id="cb10-2" title="2"><span class="kw">tell2</span>(x,y)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">out &lt;-<span class="st"> </span><span class="kw">solve_fun</span>(x, times, <span class="dt">initState =</span> initState, <span class="dt">outnames =</span> Outputs, <span class="dt">dllname =</span> mName)</a></code></pre></div>
 <p>To create the time-dependent sensitivity measurement, we set the time duration from 0.01 to 24.01 hours in the example. The <code>initParmsfun</code> is used to generate the sampling value for each parameter. The <code>outnames</code>, <code>dllname</code>, <code>func</code>, <code>initfunc</code> are based on the arguments from the ode function in <code>deSolve</code> package. The details of the model structure and these arguments are defined in <code>pbtk1comp.c</code>. and <code>pbtk1comp_inits.R</code>. Finally, the <code>tell2</code> function is used to integrate the parameter values and the output results of numerical analysis that were generated and stored in variables x and y. The result of object x is an object of rfast99, which has specific <code>print</code>, <code>plot</code>, and <code>check</code> method. The print function gives the sensitivity and convergence indices for main, interaction, and total order at each time point. In addition to print out the result of sensitivity analysis, the more efficient way to distinguish the influence of model parameter is to visualize them. The time-dependent sensitivity indices are shown in Figure 2.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">plot</span>(x)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">plot</span>(out)</a></code></pre></div>
 <p>Here, we can find that <code>vdist</code> and <code>ke</code> are dominating the plasma concentration in the before and after 5-hour post chemical intake, respectively, representing that the elimination is a key parameter to dominate the plasma concentration. Besides, the <code>kgutabs</code> only plays a crucial role to determine the plasma concentration in the first hour. The relationship between concentration and the parameters can be plotted as follow (Figure 3):</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">3</span>), <span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>), <span class="dt">oma =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb12-2" title="2"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;vdist&quot;</span>], y[,<span class="dv">1</span>,<span class="st">&quot;0.01&quot;</span>,], <span class="dt">main =</span> <span class="st">&quot;vdist&quot;</span>)</a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;vdist&quot;</span>], out<span class="op">$</span>y[,<span class="dv">1</span>,<span class="st">&quot;0.01&quot;</span>,], <span class="dt">main =</span> <span class="st">&quot;vdist&quot;</span>)</a>
 <a class="sourceLine" id="cb12-3" title="3"><span class="kw">text</span>(<span class="dv">1</span>, <span class="fl">.7</span>, <span class="st">&quot;t=0.01&quot;</span>,<span class="dt">cex =</span> <span class="fl">1.2</span>)</a>
-<a class="sourceLine" id="cb12-4" title="4"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;ke&quot;</span>], y[,<span class="dv">1</span>,<span class="st">&quot;0.01&quot;</span>,], <span class="dt">main =</span> <span class="st">&quot;ke&quot;</span>)</a>
-<a class="sourceLine" id="cb12-5" title="5"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;kgutabs&quot;</span>], y[,<span class="dv">1</span>,<span class="st">&quot;0.01&quot;</span>,], <span class="dt">main =</span> <span class="st">&quot;kgutabs&quot;</span>)</a>
-<a class="sourceLine" id="cb12-6" title="6"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;vdist&quot;</span>], y[,<span class="dv">1</span>,<span class="st">&quot;2.01&quot;</span>,])</a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;ke&quot;</span>], out<span class="op">$</span>y[,<span class="dv">1</span>,<span class="st">&quot;0.01&quot;</span>,], <span class="dt">main =</span> <span class="st">&quot;ke&quot;</span>)</a>
+<a class="sourceLine" id="cb12-5" title="5"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;kgutabs&quot;</span>], out<span class="op">$</span>y[,<span class="dv">1</span>,<span class="st">&quot;0.01&quot;</span>,], <span class="dt">main =</span> <span class="st">&quot;kgutabs&quot;</span>)</a>
+<a class="sourceLine" id="cb12-6" title="6"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;vdist&quot;</span>], out<span class="op">$</span>y[,<span class="dv">1</span>,<span class="st">&quot;2.01&quot;</span>,])</a>
 <a class="sourceLine" id="cb12-7" title="7"><span class="kw">text</span>(<span class="dv">1</span>, <span class="dv">18</span>, <span class="st">&quot;t=2.01&quot;</span>,<span class="dt">cex =</span> <span class="fl">1.2</span>)</a>
-<a class="sourceLine" id="cb12-8" title="8"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;ke&quot;</span>], y[,<span class="dv">1</span>,<span class="st">&quot;2.01&quot;</span>,])</a>
-<a class="sourceLine" id="cb12-9" title="9"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;kgutabs&quot;</span>], y[,<span class="dv">1</span>,<span class="st">&quot;2.01&quot;</span>,])</a>
-<a class="sourceLine" id="cb12-10" title="10"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;vdist&quot;</span>], y[,<span class="dv">1</span>,<span class="st">&quot;24.01&quot;</span>,])</a>
+<a class="sourceLine" id="cb12-8" title="8"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;ke&quot;</span>], out<span class="op">$</span>y[,<span class="dv">1</span>,<span class="st">&quot;2.01&quot;</span>,])</a>
+<a class="sourceLine" id="cb12-9" title="9"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;kgutabs&quot;</span>], out<span class="op">$</span>y[,<span class="dv">1</span>,<span class="st">&quot;2.01&quot;</span>,])</a>
+<a class="sourceLine" id="cb12-10" title="10"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;vdist&quot;</span>], out<span class="op">$</span>y[,<span class="dv">1</span>,<span class="st">&quot;24.01&quot;</span>,])</a>
 <a class="sourceLine" id="cb12-11" title="11"><span class="kw">text</span>(<span class="dv">1</span>, <span class="fl">.7</span>, <span class="st">&quot;t=24.01&quot;</span>,<span class="dt">cex =</span> <span class="fl">1.2</span>)</a>
-<a class="sourceLine" id="cb12-12" title="12"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;ke&quot;</span>], y[,<span class="dv">1</span>,<span class="st">&quot;24.01&quot;</span>,])</a>
-<a class="sourceLine" id="cb12-13" title="13"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;kgutabs&quot;</span>], y[,<span class="dv">1</span>,<span class="st">&quot;24.01&quot;</span>,])</a>
+<a class="sourceLine" id="cb12-12" title="12"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;ke&quot;</span>], out<span class="op">$</span>y[,<span class="dv">1</span>,<span class="st">&quot;24.01&quot;</span>,])</a>
+<a class="sourceLine" id="cb12-13" title="13"><span class="kw">plot</span>(x<span class="op">$</span>a[,<span class="dv">1</span>,<span class="st">&quot;kgutabs&quot;</span>], out<span class="op">$</span>y[,<span class="dv">1</span>,<span class="st">&quot;24.01&quot;</span>,])</a>
 <a class="sourceLine" id="cb12-14" title="14"><span class="kw">mtext</span>(<span class="st">&quot;parameter&quot;</span>, SOUTH&lt;-<span class="dv">1</span>, <span class="dt">line=</span><span class="fl">0.4</span>, <span class="dt">outer=</span><span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb12-15" title="15"><span class="kw">mtext</span>(<span class="st">&quot;Ccompartment&quot;</span>, WEST&lt;-<span class="dv">2</span>, <span class="dt">line=</span><span class="fl">0.4</span>, <span class="dt">outer=</span><span class="ot">TRUE</span>)</a></code></pre></div>
 <p>The x is a list of class “rfast99”, containing all the input arguments detailed before and the calculated sensitivity indices of first order (<code>mSI</code>), interaction (<code>iSI</code>), and total order (<code>tSI</code>). The convergence indices are also stored in the list named <code>mCI</code>, <code>iCI</code>, and <code>tCI</code>. The parameter values are stored in an array <code>x$a</code> with c(model evaluation, replication, parameters).</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw">dim</span>(x<span class="op">$</span>a)</a></code></pre></div>
 <p>In addition, the output are also formated with c(model evaluation, replication, time, variable).</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="kw">dim</span>(y)</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="kw">dim</span>(out<span class="op">$</span>y)</a></code></pre></div>
 <p>The <code>check()</code> is a useful function to determine which parameters have relative lower sensitivity measurement across the given time interval, and therefore can be applied parameter fixing in model calibration. The argument of <code>SI.cutoff</code> is setting at 0.5 to detect the relative non-influential parameters in this case.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="kw">check</span>(x, <span class="dt">SI.cutoff =</span> <span class="fl">0.5</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="kw">check</span>(out, <span class="dt">SI.cutoff =</span> <span class="fl">0.5</span>)</a></code></pre></div>
 <p>Based on the sensitivity measurement of the total order, the result shows that <code>kgutabs</code> has relative lower measurement of sensitivity index.</p>
 </div>
 <div id="model-implementations-with-gnu-mcsim" class="section level2">

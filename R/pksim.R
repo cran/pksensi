@@ -12,11 +12,16 @@
 #' @param ... additional arguments to customize the graphical parameters.
 #'
 #' @importFrom grDevices adjustcolor
-#' @importFrom graphics plot polygon
+#' @importFrom graphics plot polygon axis
 #' @importFrom stats quantile
 #'
 #' @export
 pksim <- function(y, vars = 1, log = F, legend = T, ...){
+
+  if(is.null(dim(y))){
+    y <- y$y
+  }
+
   times <- as.numeric(colnames(y[,1,,vars]))
 
   if(dim(y)[3] == 1) stop("The time point must greater than 1")
@@ -29,13 +34,21 @@ pksim <- function(y, vars = 1, log = F, legend = T, ...){
 
   if (log == T){
     quantY[quantY <= 0] <- NA # prevent numerical error
-    quantY <- log(quantY)
-    ytck <- pretty(c(min(quantY, na.rm=TRUE),max(quantY, na.rm=TRUE)))
+    quantY <- log(quantY, 10)
+    min <- floor(range(quantY)[1])
+    max <- ceiling(range(quantY)[2])
+    ytck <- seq(min, max, 1)
+    natural_ytck <- 10^ytck
   }
 
   col.transp = adjustcolor('black', alpha.f = 0.2)
   plot(times, quantY[1,], type="l", xlab="", ylab="",
-       ylim=c(min(ytck),max(ytck)), lty=1, las=1, lwd=2, col = 1, ...)
+       ylim=c(min(ytck),max(ytck)), lty=1, las=1, lwd=2, col = 1, yaxt = "n", ...)
+
+  if (log == T){
+    axis(2, at = ytck, labels = natural_ytck, las=2)
+  } else axis(2, at = ytck, labels = ytck, las=2)
+
   if (any(is.na(quantY[2:3,])) == FALSE)
   {
     polygon(x = c(times, rev(times)), y = c(quantY[2,],quantY[3,seq(from=length(times),to=1,by=-1)]),col=col.transp,lty=0)

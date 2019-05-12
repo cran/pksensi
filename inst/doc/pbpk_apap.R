@@ -143,43 +143,43 @@ knitr::opts_chunk$set(
 #                  time = times,
 #                  condition = conditions,
 #                  rtol = 1e-7, atol = 1e-9)
-#  system.time(y <- solve_mcsim(x, mName = mName,
+#  system.time(out <- solve_mcsim(x, mName = mName,
 #                               params = params,
 #                               vars = vars,
 #                               time = times,
 #                               condition = conditions,
 #                               generate.infile = F))
-#  tell2(x,y)
 
 ## ---- eval=F, fig.height=8, fig.width=8, fig.cap = 'Figure 1. '----------
-#  plot(x, vars = "lnCPL_AG_mcgL")
+#  plot(out, vars = "lnCPL_AG_mcgL")
 
 ## ---- eval=F, fig.cap = 'Figure 2. The range of model simulation based on parameter distribution'----
+#  data(APAP)
 #  par(mfrow = c(2,2), mar = c(2,2,1,1), oma = c(2,2,1,1))
-#  pksim(y, vars = "lnCPL_APAP_mcgL")
+#  pksim(out, vars = "lnCPL_APAP_mcgL")
 #  text(1, 15, "APAP",cex = 1.2)
 #  points(APAP$Time, log(APAP$APAP * 1000))
-#  pksim(y, vars = "lnCPL_AG_mcgL", legend = F)
+#  pksim(out, vars = "lnCPL_AG_mcgL", legend = F)
 #  text(1, 15, "AG",cex = 1.2)
 #  points(APAP$Time, log(APAP$AG * 1000))
-#  pksim(y, vars = "lnCPL_AS_mcgL", legend = F)
+#  pksim(out, vars = "lnCPL_AS_mcgL", legend = F)
 #  text(1, 15, "AS",cex = 1.2)
 #  points(APAP$Time, log(APAP$AS * 1000))
 #  mtext("Time", SOUTH<-1, line=0.4, cex=1.2, outer=TRUE)
 #  mtext("Conc.", WEST<-2, line=0.4, cex=1.2, outer=TRUE)
 
 ## ---- eval=F-------------------------------------------------------------
-#  check(x)
+#  check(out)
 
 ## ---- eval=F-------------------------------------------------------------
-#  check(x, vars = "lnCPL_APAP_mcgL", SI.cutoff = 0.1, CI.cutoff = 0.1)
+#  check(out, vars = "lnCPL_APAP_mcgL", SI.cutoff = 0.1, CI.cutoff = 0.1)
 
 ## ---- eval=F, 'Figure 3: Heatmap of sensitivity index for interaction'----
-#  heat_check(x, order = "interaction")
+#  heat_check(out, order = "interaction")
 
 ## ---- eval=F, 'Figure 4: Heatmap of convergence index for total order'----
-#  heat_check(x, order = "total order")
+#  heat_check(out, order = "total order")
 
 ## ---- eval=F, fig.height=9, 'Figure 5: Heatmap of convergence index'-----
-#  heat_check(x, index = "CI", CI.cutoff = 0.05)
+#  heat_check(out, index = "CI", CI.cutoff = 0.05)
 

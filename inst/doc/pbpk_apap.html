@@ -12,7 +12,7 @@
 
 <meta name="author" content="Nan-Hung Hsieh" />
 
-<meta name="date" content="2019-01-29" />
+<meta name="date" content="2019-05-12" />
 
 <title>Acetaminophen-PBPK model</title>
 
@@ -291,6 +291,9 @@ code > span.al { color: #ff0000; font-weight: bold; }
 code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
+
+
+
 </head>
 
 <body>
@@ -299,8 +302,8 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 
 <h1 class="title toc-ignore">Acetaminophen-PBPK model</h1>
-<h4 class="author"><em>Nan-Hung Hsieh</em></h4>
-<h4 class="date"><em>2019-01-29</em></h4>
+<h4 class="author">Nan-Hung Hsieh</h4>
+<h4 class="date">2019-05-12</h4>
 
 
 
@@ -369,40 +372,40 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb4-7" title="7">                <span class="dt">time =</span> times, </a>
 <a class="sourceLine" id="cb4-8" title="8">                <span class="dt">condition =</span> conditions,</a>
 <a class="sourceLine" id="cb4-9" title="9">                <span class="dt">rtol =</span> <span class="fl">1e-7</span>, <span class="dt">atol =</span> <span class="fl">1e-9</span>)</a>
-<a class="sourceLine" id="cb4-10" title="10"><span class="kw">system.time</span>(y &lt;-<span class="st"> </span><span class="kw">solve_mcsim</span>(x, <span class="dt">mName =</span> mName, </a>
+<a class="sourceLine" id="cb4-10" title="10"><span class="kw">system.time</span>(out &lt;-<span class="st"> </span><span class="kw">solve_mcsim</span>(x, <span class="dt">mName =</span> mName, </a>
 <a class="sourceLine" id="cb4-11" title="11">                             <span class="dt">params =</span> params,</a>
 <a class="sourceLine" id="cb4-12" title="12">                             <span class="dt">vars =</span> vars,</a>
 <a class="sourceLine" id="cb4-13" title="13">                             <span class="dt">time =</span> times,</a>
 <a class="sourceLine" id="cb4-14" title="14">                             <span class="dt">condition =</span> conditions,</a>
-<a class="sourceLine" id="cb4-15" title="15">                             <span class="dt">generate.infile =</span> F))</a>
-<a class="sourceLine" id="cb4-16" title="16"><span class="kw">tell2</span>(x,y)</a></code></pre></div>
+<a class="sourceLine" id="cb4-15" title="15">                             <span class="dt">generate.infile =</span> F))</a></code></pre></div>
 <p>The plotting function can output the result of time-dependent sensitivity measurement to determine the parameter impact on model output over time (Figure 1).</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">plot</span>(x, <span class="dt">vars =</span> <span class="st">&quot;lnCPL_AG_mcgL&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">plot</span>(out, <span class="dt">vars =</span> <span class="st">&quot;lnCPL_AG_mcgL&quot;</span>)</a></code></pre></div>
 <p>The uncertainty analysis is a crucial step before model calibration. We can apply uncertainty analysis through the <code>pksim()</code> by the given name of output variables (Figure 2). Through this visualization approach, we can recognize whether the simulated outputs can accurately simulate the same concentration profile as the in-vivo experiment under the setting of parameter ranges. In Figure 2, all experiment points are included in the intervals, representing the acceptable set of the parameter range.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>), <span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="dt">oma =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb6-2" title="2"><span class="kw">pksim</span>(y, <span class="dt">vars =</span> <span class="st">&quot;lnCPL_APAP_mcgL&quot;</span>)</a>
-<a class="sourceLine" id="cb6-3" title="3"><span class="kw">text</span>(<span class="dv">1</span>, <span class="dv">15</span>, <span class="st">&quot;APAP&quot;</span>,<span class="dt">cex =</span> <span class="fl">1.2</span>)</a>
-<a class="sourceLine" id="cb6-4" title="4"><span class="kw">points</span>(APAP<span class="op">$</span>Time, <span class="kw">log</span>(APAP<span class="op">$</span>APAP <span class="op">*</span><span class="st"> </span><span class="dv">1000</span>))</a>
-<a class="sourceLine" id="cb6-5" title="5"><span class="kw">pksim</span>(y, <span class="dt">vars =</span> <span class="st">&quot;lnCPL_AG_mcgL&quot;</span>, <span class="dt">legend =</span> F)</a>
-<a class="sourceLine" id="cb6-6" title="6"><span class="kw">text</span>(<span class="dv">1</span>, <span class="dv">15</span>, <span class="st">&quot;AG&quot;</span>,<span class="dt">cex =</span> <span class="fl">1.2</span>)</a>
-<a class="sourceLine" id="cb6-7" title="7"><span class="kw">points</span>(APAP<span class="op">$</span>Time, <span class="kw">log</span>(APAP<span class="op">$</span>AG <span class="op">*</span><span class="st"> </span><span class="dv">1000</span>))</a>
-<a class="sourceLine" id="cb6-8" title="8"><span class="kw">pksim</span>(y, <span class="dt">vars =</span> <span class="st">&quot;lnCPL_AS_mcgL&quot;</span>, <span class="dt">legend =</span> F)</a>
-<a class="sourceLine" id="cb6-9" title="9"><span class="kw">text</span>(<span class="dv">1</span>, <span class="dv">15</span>, <span class="st">&quot;AS&quot;</span>,<span class="dt">cex =</span> <span class="fl">1.2</span>)</a>
-<a class="sourceLine" id="cb6-10" title="10"><span class="kw">points</span>(APAP<span class="op">$</span>Time, <span class="kw">log</span>(APAP<span class="op">$</span>AS <span class="op">*</span><span class="st"> </span><span class="dv">1000</span>))</a>
-<a class="sourceLine" id="cb6-11" title="11"><span class="kw">mtext</span>(<span class="st">&quot;Time&quot;</span>, SOUTH&lt;-<span class="dv">1</span>, <span class="dt">line=</span><span class="fl">0.4</span>, <span class="dt">cex=</span><span class="fl">1.2</span>, <span class="dt">outer=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb6-12" title="12"><span class="kw">mtext</span>(<span class="st">&quot;Conc.&quot;</span>, WEST&lt;-<span class="dv">2</span>, <span class="dt">line=</span><span class="fl">0.4</span>, <span class="dt">cex=</span><span class="fl">1.2</span>, <span class="dt">outer=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">data</span>(APAP)</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>), <span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="dt">oma =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="kw">pksim</span>(out, <span class="dt">vars =</span> <span class="st">&quot;lnCPL_APAP_mcgL&quot;</span>)</a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="kw">text</span>(<span class="dv">1</span>, <span class="dv">15</span>, <span class="st">&quot;APAP&quot;</span>,<span class="dt">cex =</span> <span class="fl">1.2</span>)</a>
+<a class="sourceLine" id="cb6-5" title="5"><span class="kw">points</span>(APAP<span class="op">$</span>Time, <span class="kw">log</span>(APAP<span class="op">$</span>APAP <span class="op">*</span><span class="st"> </span><span class="dv">1000</span>))</a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="kw">pksim</span>(out, <span class="dt">vars =</span> <span class="st">&quot;lnCPL_AG_mcgL&quot;</span>, <span class="dt">legend =</span> F)</a>
+<a class="sourceLine" id="cb6-7" title="7"><span class="kw">text</span>(<span class="dv">1</span>, <span class="dv">15</span>, <span class="st">&quot;AG&quot;</span>,<span class="dt">cex =</span> <span class="fl">1.2</span>)</a>
+<a class="sourceLine" id="cb6-8" title="8"><span class="kw">points</span>(APAP<span class="op">$</span>Time, <span class="kw">log</span>(APAP<span class="op">$</span>AG <span class="op">*</span><span class="st"> </span><span class="dv">1000</span>))</a>
+<a class="sourceLine" id="cb6-9" title="9"><span class="kw">pksim</span>(out, <span class="dt">vars =</span> <span class="st">&quot;lnCPL_AS_mcgL&quot;</span>, <span class="dt">legend =</span> F)</a>
+<a class="sourceLine" id="cb6-10" title="10"><span class="kw">text</span>(<span class="dv">1</span>, <span class="dv">15</span>, <span class="st">&quot;AS&quot;</span>,<span class="dt">cex =</span> <span class="fl">1.2</span>)</a>
+<a class="sourceLine" id="cb6-11" title="11"><span class="kw">points</span>(APAP<span class="op">$</span>Time, <span class="kw">log</span>(APAP<span class="op">$</span>AS <span class="op">*</span><span class="st"> </span><span class="dv">1000</span>))</a>
+<a class="sourceLine" id="cb6-12" title="12"><span class="kw">mtext</span>(<span class="st">&quot;Time&quot;</span>, SOUTH&lt;-<span class="dv">1</span>, <span class="dt">line=</span><span class="fl">0.4</span>, <span class="dt">cex=</span><span class="fl">1.2</span>, <span class="dt">outer=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb6-13" title="13"><span class="kw">mtext</span>(<span class="st">&quot;Conc.&quot;</span>, WEST&lt;-<span class="dv">2</span>, <span class="dt">line=</span><span class="fl">0.4</span>, <span class="dt">cex=</span><span class="fl">1.2</span>, <span class="dt">outer=</span><span class="ot">TRUE</span>)</a></code></pre></div>
 <p>In addition, through using the <code>check()</code>, the parameter with sensitivity and convergence indices over the given condition can be easily detected for all output variables.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">check</span>(x)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">check</span>(out)</a></code></pre></div>
 <p>The <code>check()</code> also provides some feasible argument to specify the target output or change the cut-off value.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="kw">check</span>(x, <span class="dt">vars =</span> <span class="st">&quot;lnCPL_APAP_mcgL&quot;</span>, <span class="dt">SI.cutoff =</span> <span class="fl">0.1</span>, <span class="dt">CI.cutoff =</span> <span class="fl">0.1</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="kw">check</span>(out, <span class="dt">vars =</span> <span class="st">&quot;lnCPL_APAP_mcgL&quot;</span>, <span class="dt">SI.cutoff =</span> <span class="fl">0.1</span>, <span class="dt">CI.cutoff =</span> <span class="fl">0.1</span>)</a></code></pre></div>
 </div>
 <div id="heatmap-visualization-combined-with-an-index-cut-off" class="section level2">
 <h2>Heatmap visualization combined with an index “cut-off”</h2>
 <p>Based on our previous study, we proposed the heatmap visualization approach to distinguish “influential” and “non-influential” parameters with a cut-off. Through the given argument <code>order</code>, we can select the specific order of sensitivity measurement that we’re interested in (Figure 3 &amp; 4).</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw">heat_check</span>(x, <span class="dt">order =</span> <span class="st">&quot;interaction&quot;</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">heat_check</span>(x, <span class="dt">order =</span> <span class="st">&quot;total order&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw">heat_check</span>(out, <span class="dt">order =</span> <span class="st">&quot;interaction&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">heat_check</span>(out, <span class="dt">order =</span> <span class="st">&quot;total order&quot;</span>)</a></code></pre></div>
 <p>Also, adding the <code>index = &quot;CI&quot;</code> in the function can further investigate the convergence of the sensitivity index. Based on the current setting of sampling number, most parameters cannot reach the acceptable criteria of convergence. Therefore, the higher number of sampling is necessary.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">heat_check</span>(x, <span class="dt">index =</span> <span class="st">&quot;CI&quot;</span>, <span class="dt">CI.cutoff =</span> <span class="fl">0.05</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">heat_check</span>(out, <span class="dt">index =</span> <span class="st">&quot;CI&quot;</span>, <span class="dt">CI.cutoff =</span> <span class="fl">0.05</span>)</a></code></pre></div>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2>References</h2>

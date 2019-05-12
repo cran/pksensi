@@ -64,26 +64,25 @@ fn = local({ # not used function for fig caption
 #  x <- rfast99(params, n = 200, q = q, q.arg = q.arg, replicate = 20)
 
 ## ---- eval=F-------------------------------------------------------------
-#  y <- solve_fun(x, times, initState = initState, outnames = Outputs, dllname = mName)
-#  tell2(x,y)
+#  out <- solve_fun(x, times, initState = initState, outnames = Outputs, dllname = mName)
 
 ## ---- eval=F, fig.cap = 'Figure 2. Time-dependent sensitivity indices of the plasma concentration estimated from one-compartment PBTK model during 24 hour time period intake.'----
-#  plot(x)
+#  plot(out)
 
 ## ---- eval=F, fig.cap = 'Figure 3. The relationship between model parameter and estimated concentration under the time-point of 0.01, 2.01, and 24.01 hr'----
 #  par(mfrow = c(3,3), mar = c(2,2,2,2), oma = c(2,2,1,1))
-#  plot(x$a[,1,"vdist"], y[,1,"0.01",], main = "vdist")
+#  plot(x$a[,1,"vdist"], out$y[,1,"0.01",], main = "vdist")
 #  text(1, .7, "t=0.01",cex = 1.2)
-#  plot(x$a[,1,"ke"], y[,1,"0.01",], main = "ke")
-#  plot(x$a[,1,"kgutabs"], y[,1,"0.01",], main = "kgutabs")
-#  plot(x$a[,1,"vdist"], y[,1,"2.01",])
+#  plot(x$a[,1,"ke"], out$y[,1,"0.01",], main = "ke")
+#  plot(x$a[,1,"kgutabs"], out$y[,1,"0.01",], main = "kgutabs")
+#  plot(x$a[,1,"vdist"], out$y[,1,"2.01",])
 #  text(1, 18, "t=2.01",cex = 1.2)
-#  plot(x$a[,1,"ke"], y[,1,"2.01",])
-#  plot(x$a[,1,"kgutabs"], y[,1,"2.01",])
-#  plot(x$a[,1,"vdist"], y[,1,"24.01",])
+#  plot(x$a[,1,"ke"], out$y[,1,"2.01",])
+#  plot(x$a[,1,"kgutabs"], out$y[,1,"2.01",])
+#  plot(x$a[,1,"vdist"], out$y[,1,"24.01",])
 #  text(1, .7, "t=24.01",cex = 1.2)
-#  plot(x$a[,1,"ke"], y[,1,"24.01",])
-#  plot(x$a[,1,"kgutabs"], y[,1,"24.01",])
+#  plot(x$a[,1,"ke"], out$y[,1,"24.01",])
+#  plot(x$a[,1,"kgutabs"], out$y[,1,"24.01",])
 #  mtext("parameter", SOUTH<-1, line=0.4, outer=TRUE)
 #  mtext("Ccompartment", WEST<-2, line=0.4, outer=TRUE)
 
@@ -91,10 +90,10 @@ fn = local({ # not used function for fig caption
 #  dim(x$a)
 
 ## ---- eval=F-------------------------------------------------------------
-#  dim(y)
+#  dim(out$y)
 
 ## ---- eval=F-------------------------------------------------------------
-#  check(x, SI.cutoff = 0.5)
+#  check(out, SI.cutoff = 0.5)
 
 ## ---- eval=F-------------------------------------------------------------
 #  system.time(y<-solve_fun(x, times, initState = initState, outnames = Outputs, dllname = mName))
