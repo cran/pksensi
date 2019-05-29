@@ -126,29 +126,23 @@ knitr::opts_chunk$set(
 #  
 #  times <- seq(from = 0.1, to = 12.1, by = 0.2)
 #  set.seed(1234)
-#  x <- rfast99(params = params, n = 512, q = q, q.arg = q.arg, replicate = 10)
+#  x <- rfast99(params = params, n = 1024, q = q, q.arg = q.arg, replicate = 5) # Used n = 8192 and rep = 10 in published papaer
 
 ## ---- eval=F-------------------------------------------------------------
 #  mName <- "pbpk_apap"
 #  pbpk_apap_model()
-#  compile_model(mName, application = "mcsim")
+#  compile_model(mName, application = "mcsim", version = "6.1.0")
 
 ## ---- eval=F-------------------------------------------------------------
 #  vars <- c("lnCPL_APAP_mcgL", "lnCPL_AG_mcgL", "lnCPL_AS_mcgL")
 #  conditions <- c("mgkg_flag = 1",
 #                  "OralExp_APAP = NDoses(2, 1, 0, 0, 0.001)",
 #                  "OralDose_APAP_mgkg = 20.0")
-#  generate_infile(params = params,
-#                  vars = vars,
-#                  time = times,
-#                  condition = conditions,
-#                  rtol = 1e-7, atol = 1e-9)
 #  system.time(out <- solve_mcsim(x, mName = mName,
 #                               params = params,
 #                               vars = vars,
 #                               time = times,
-#                               condition = conditions,
-#                               generate.infile = F))
+#                               condition = conditions))
 
 ## ---- eval=F, fig.height=8, fig.width=8, fig.cap = 'Figure 1. '----------
 #  plot(out, vars = "lnCPL_AG_mcgL")
@@ -181,5 +175,5 @@ knitr::opts_chunk$set(
 #  heat_check(out, order = "total order")
 
 ## ---- eval=F, fig.height=9, 'Figure 5: Heatmap of convergence index'-----
-#  heat_check(out, index = "CI", CI.cutoff = 0.05)
+#  heat_check(out, index = "CI")
 

@@ -75,8 +75,8 @@ solve_mcsim <- function(x, mName,
                         monte_carlo = NULL, dist = NULL, q.arg = NULL){
 
   message(paste0("Starting time: ", Sys.time()))
-  if(is.null(infile.name)) infile.name <- "input.in"
-  if(is.null(outfile.name)) outfile.name <- "sim.out"
+  if(is.null(infile.name)) infile.name <- "sim.in"
+  if(is.null(outfile.name)) outfile.name <- "simmc.out"
 
   if(generate.infile == T){
     if (is.null(monte_carlo)){
@@ -85,6 +85,7 @@ solve_mcsim <- function(x, mName,
                       params = params,
                       vars = vars,
                       time = time,
+                      rtol = rtol, atol = atol,
                       condition = condition)
     } else { # must be Monte Carlo
       generate_infile(infile.name = infile.name,
@@ -92,8 +93,8 @@ solve_mcsim <- function(x, mName,
                       params = params,
                       vars = vars,
                       time = time,
-                      condition = condition,
                       rtol = rtol, atol = atol,
+                      condition = condition,
                       monte_carlo = monte_carlo, dist = dist, q.arg = q.arg)
     }
   }
@@ -103,13 +104,20 @@ solve_mcsim <- function(x, mName,
   }
 
   if(!is.null(condition)){
-    setpoint.data <- "setpoint.out"
+    setpoint.data <- "setpts.out"
   } else setpoint.data <- setpoint.name
 
-  mcsim. <- paste0("mcsim.", mName)
-  mcsim. <- ifelse(file.exists(mcsim.) ,mcsim., paste0(mcsim., ".exe")) # Design for MCSim under R
-  if(file.exists(mcsim.) == F){
-    stop(paste0("The ", mcsim., " doesn't exist."))
+  if (.Platform$OS.type == "unix"){
+    mcsim. <- paste0("mcsim.", mName)
+  } else if (.Platform$OS.type == "windows"){ # Windows user but not MCSim under R
+    mcsim. <- paste0("mcsim.", mName, ".model.exe")
+  }
+
+  if(file.exists(mcsim.) == F){ # Design for MCSim under R
+    mcsim. <- paste0("mcsim.", mName, ".exe")
+    if(file.exists(mcsim.) == F){
+      stop(paste0("The ", mcsim., " doesn't exist."))
+    }
   }
 
   #
@@ -167,12 +175,15 @@ solve_mcsim <- function(x, mName,
 
   invisible(gc()); # clean memory
 
-  if (length(time) > 1) {
-    dimnames(y)[[3]] <- time
-    dimnames(y)[[4]] <- vars
-  } else {
+  if (length(time) == 1 && length(vars) == 1) {
     dimnames(y)[[3]] <- list(time)
     dimnames(y)[[4]] <- list(vars)
+  } else if (length(time) == 1 && length(vars) > 1){
+    dimnames(y)[[3]] <- list(time)
+    dimnames(y)[[4]] <- vars
+  } else {
+    dimnames(y)[[3]] <- time
+    dimnames(y)[[4]] <- vars
   }
 
   if (is.null(monte_carlo) && tell == T){
@@ -195,9 +206,9 @@ generate_infile <- function(infile.name = NULL,
                             condition, rtol = 1e-6, atol = 1e-6,
                             monte_carlo = NULL, dist = NULL, q.arg = NULL){ # Monte Carlo
 
-  if(is.null(infile.name)) infile.name <- "input.in"
-  if(is.null(outfile.name)) outfile.name <- "sim.out"
-  setpoint.data <- "setpoint.out"
+  if(is.null(infile.name)) infile.name <- "sim.in"
+  if(is.null(outfile.name)) outfile.name <- "simmc.out"
+  setpoint.data <- "setpts.out"
 
   #if(file.exists(paste0(infile.name)) == T){
   #  if(menu(c("Yes", "No"),

@@ -69,6 +69,10 @@ mcsim_install <- function(version = "6.1.0", directory = NULL, mxstep = 500) {
   if (is.null(directory)){
     if (Sys.info()[['sysname']] == "Darwin"){
       setwd(paste0("/Users/", name, sprintf('/mcsim-%s', version)))
+
+      # The MacOS used clang as default compiler, the following command is used to switch to GCC
+      Sys.setenv(PATH = paste("/usr/local/bin", Sys.getenv("PATH"), sep=";"))
+
     } else if (Sys.info()[['sysname']] == "Linux") {
       setwd(paste0("/home/", name, sprintf('/mcsim-%s', version)))
     } else if (Sys.info()[['sysname']] == "Windows") {
@@ -119,7 +123,11 @@ mcsim_install <- function(version = "6.1.0", directory = NULL, mxstep = 500) {
 #' @export
 #' @describeIn mcsim Return the version number of GNU MCSim.
 mcsim_version <- function(){
-  invisible(system("mod -h | tee mod.mcsim.txt", intern = TRUE))
+
+  if(file.exists("MCSim/mod.exe")){ # for MCSim under R
+    invisible(system("./MCSim/mod.exe -h | tee mod.mcsim.txt", intern = TRUE))
+  } else invisible(system("mod -h | tee mod.mcsim.txt", intern = TRUE))
+
   l <- readLines("mod.mcsim.txt")
   invisible(file.remove("mod.mcsim.txt"))
   version <- substr(l[4], 6, 10)
