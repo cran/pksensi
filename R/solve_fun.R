@@ -54,6 +54,9 @@ solve_fun <- function(x, time = NULL, initParmsfun = "initParms", initState, dll
                       func = "derivs", initfunc = "initmod", outnames,
                       method ="lsode", rtol=1e-8, atol=1e-12,
                       model = NULL, lnparam = F, vars = NULL, tell = T, ...){
+
+  message(paste0("Starting time: ", Sys.time()))
+
   n <- length(x$s)
   no.params <- ifelse (class(x$params) == "character", length(x$params), x$params)
   replicate <- x$rep
@@ -129,6 +132,8 @@ solve_fun <- function(x, time = NULL, initParmsfun = "initParms", initState, dll
   if (tell == T){
     tell2(x, y)
   }
+
+  message(paste0("Ending time: ", Sys.time()))
 
   if (tell == T){
     return(x)

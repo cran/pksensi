@@ -75,6 +75,7 @@ solve_mcsim <- function(x, mName,
                         monte_carlo = NULL, dist = NULL, q.arg = NULL){
 
   message(paste0("Starting time: ", Sys.time()))
+
   if(is.null(infile.name)) infile.name <- "sim.in"
   if(is.null(outfile.name)) outfile.name <- "simmc.out"
 

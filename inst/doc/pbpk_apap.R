@@ -96,84 +96,77 @@ knitr::opts_chunk$set(
 #  rng <- 1.96
 
 ## ---- eval=F-------------------------------------------------------------
+#  mName <- "pbpk_apap"
+#  pbpk_apap_model()
+#  compile_model(mName, application = "mcsim")
+
+## ---- eval=F-------------------------------------------------------------
 #  params <- c("lnTg", "lnTp", "lnCYP_Km","lnCYP_VmaxC",
 #             "lnSULT_Km_apap","lnSULT_Ki","lnSULT_Km_paps","lnSULT_VmaxC",
 #             "lnUGT_Km","lnUGT_Ki","lnUGT_Km_GA","lnUGT_VmaxC",
 #             "lnKm_AG","lnVmax_AG","lnKm_AS","lnVmax_AS",
 #             "lnkGA_syn","lnkPAPS_syn", "lnCLC_APAP","lnCLC_AG","lnCLC_AS")
-#  q <- "qunif"
-#  q.arg <-list(list(Tg-rng, Tg+rng),
-#               list(Tp-rng, Tp+rng),
-#               list(CYP_Km-rng, CYP_Km+rng),
-#               list(-2., 5.),
+#  dist <- rep("Uniform", 21)
+#  q <- rep("qunif", 21)
+#  q.arg <-list(list(Tg-rng, Tg+rng), list(Tp-rng, Tp+rng),
+#               list(CYP_Km-rng, CYP_Km+rng), list(-2., 5.),
 #               list(SULT_Km_apap-rng, SULT_Km_apap+rng),
 #               list(SULT_Ki-rng, SULT_Ki+rng),
 #               list(SULT_Km_paps-rng, SULT_Km_paps+rng),
-#               list(0, 10),
-#               list(UGT_Km-rng, UGT_Km+rng),
+#               list(0, 10), list(UGT_Km-rng, UGT_Km+rng),
 #               list(UGT_Ki-rng, UGT_Ki+rng),
 #               list(UGT_Km_GA-rng, UGT_Km_GA+rng),
-#               list(0, 10),
-#               list(Km_AG-rng, Km_AG+rng),
-#               list(7., 15),
-#               list(Km_AS-rng, Km_AS+rng),
-#               list(7., 15),
-#               list(0., 13),
-#               list(0., 13),
-#               list(-6., 1),
-#               list(-6., 1),
-#               list(-6., 1))
-#  
-#  times <- seq(from = 0.1, to = 12.1, by = 0.2)
-#  set.seed(1234)
-#  x <- rfast99(params = params, n = 1024, q = q, q.arg = q.arg, replicate = 5) # Used n = 8192 and rep = 10 in published papaer
+#               list(0, 10), list(Km_AG-rng, Km_AG+rng),
+#               list(7., 15), list(Km_AS-rng, Km_AS+rng),
+#               list(7., 15), list(0., 13), list(0., 13),
+#               list(-6., 1), list(-6., 1), list(-6., 1))
 
 ## ---- eval=F-------------------------------------------------------------
-#  mName <- "pbpk_apap"
-#  pbpk_apap_model()
-#  compile_model(mName, application = "mcsim", version = "6.1.0")
-
-## ---- eval=F-------------------------------------------------------------
-#  vars <- c("lnCPL_APAP_mcgL", "lnCPL_AG_mcgL", "lnCPL_AS_mcgL")
 #  conditions <- c("mgkg_flag = 1",
 #                  "OralExp_APAP = NDoses(2, 1, 0, 0, 0.001)",
 #                  "OralDose_APAP_mgkg = 20.0")
-#  system.time(out <- solve_mcsim(x, mName = mName,
-#                               params = params,
-#                               vars = vars,
-#                               time = times,
-#                               condition = conditions))
+#  vars <- c("lnCPL_APAP_mcgL", "lnCPL_AG_mcgL", "lnCPL_AS_mcgL")
+#  times <- seq(from = 0.1, to = 12.1, by = 0.2)
 
-## ---- eval=F, fig.height=8, fig.width=8, fig.cap = 'Figure 1. '----------
-#  plot(out, vars = "lnCPL_AG_mcgL")
+## ---- eval=F-------------------------------------------------------------
+#  head(APAP)
 
-## ---- eval=F, fig.cap = 'Figure 2. The range of model simulation based on parameter distribution'----
-#  data(APAP)
-#  par(mfrow = c(2,2), mar = c(2,2,1,1), oma = c(2,2,1,1))
-#  pksim(out, vars = "lnCPL_APAP_mcgL")
-#  text(1, 15, "APAP",cex = 1.2)
+## ---- eval=F-------------------------------------------------------------
+#  set.seed(1111)
+#  out <- solve_mcsim(mName = mName, params = params, vars = vars,
+#                     monte_carlo = 1000, dist = dist, q.arg = q.arg,
+#                     time = times, condition = conditions,
+#                     rtol = 1e-7, atol = 1e-9)
+
+## ---- eval=F, fig.cap = '**Figure 1.** Coverage checks of prior PBPK model predictions with calibrated APAP data', fig.height=3.5, fig.width=9----
+#  par(mfrow = c(1,3), mar = c(4,4,1,1))
+#  pksim(out, xlab = "Time (h)", ylab = "Conc. (ug/L)", main = "APAP")
 #  points(APAP$Time, log(APAP$APAP * 1000))
-#  pksim(out, vars = "lnCPL_AG_mcgL", legend = F)
-#  text(1, 15, "AG",cex = 1.2)
+#  pksim(out, vars = "lnCPL_AG_mcgL", xlab = "Time (h)", main = "APAP-G",
+#        ylab = " ", legend = FALSE)
 #  points(APAP$Time, log(APAP$AG * 1000))
-#  pksim(out, vars = "lnCPL_AS_mcgL", legend = F)
-#  text(1, 15, "AS",cex = 1.2)
+#  pksim(out, vars = "lnCPL_AS_mcgL", xlab = "Time (h)", main = "APAP-S",
+#        ylab = " ", legend = FALSE)
 #  points(APAP$Time, log(APAP$AS * 1000))
-#  mtext("Time", SOUTH<-1, line=0.4, cex=1.2, outer=TRUE)
-#  mtext("Conc.", WEST<-2, line=0.4, cex=1.2, outer=TRUE)
 
 ## ---- eval=F-------------------------------------------------------------
-#  check(out)
+#  set.seed(1234)
+#  x <- rfast99(params = params, n = 512, q = q, q.arg = q.arg, replicate = 10)
 
 ## ---- eval=F-------------------------------------------------------------
-#  check(out, vars = "lnCPL_APAP_mcgL", SI.cutoff = 0.1, CI.cutoff = 0.1)
+#  out <- solve_mcsim(x, mName = mName,
+#                     params = params,
+#                     time = times,
+#                     vars = vars,
+#                     condition = conditions,
+#                     rtol = 1e-7, atol = 1e-9)
 
-## ---- eval=F, 'Figure 3: Heatmap of sensitivity index for interaction'----
-#  heat_check(out, order = "interaction")
+## ---- eval=F, fig.cap = '**Figure 2.** Time-dependent SI of the plasma APAP concentration estimated from APAP-PBPK model during 12-hr time period post intake.', fig.height=8, fig.width=8----
+#  plot(out, vars = "lnCPL_APAP_mcgL")
 
-## ---- eval=F, 'Figure 4: Heatmap of convergence index for total order'----
+## ---- eval=F, fig.cap = '**Figure 3.** Heat map representation of time-dependent total SI computed for global SA method', fig.height=5----
 #  heat_check(out, order = "total order")
 
-## ---- eval=F, fig.height=9, 'Figure 5: Heatmap of convergence index'-----
-#  heat_check(out, index = "CI")
+## ---- eval=F, fig.cap = '**Figure 4.** Heat map representation of time-dependent total CI computed for global SA method', fig.height=5----
+#  heat_check(out, index = "CI", order = "total order")
 

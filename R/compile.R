@@ -16,7 +16,7 @@
 #' @param application a character to assign the specific methods (\code{mcsim} or \code{R})
 #' that will be applied to the numerical analysis (default is \code{mcsim}).
 #' @param version a character to assign the version of MCSim that had been installed.
-#' The version must be assigned for Windows user.
+#' The version must be assigned for Windows user (default is \code{6.1.0}).
 #'
 #' @return
 #' The default \code{application} is set to \code{'mcsim'}
@@ -27,7 +27,7 @@
 #'
 #'
 #' @export
-compile_model <- function (mName, application = 'mcsim', use_model_file = TRUE, version = NULL) {
+compile_model <- function (mName, application = 'mcsim', use_model_file = TRUE, version = '6.1.0') {
 
   if (application == 'mcsim' && .Platform$OS.type == "windows"){
     mName <- paste0(mName,".model")
@@ -50,7 +50,7 @@ compile_model <- function (mName, application = 'mcsim', use_model_file = TRUE, 
       if (is.null(version)) stop("Please provide the version of MCSim")
       mcsim <- paste0("mcsim-", version)
       name <- Sys.info()[['user']]
-      exdir <- paste0("c:\\Users\\", name, "\\", mcsim)
+      exdir <- paste0("c:/Users/", name, "/", mcsim)
       mod <-paste0("c:/Users/", name, "/", mcsim, "/mod/mod.exe")
       sim <-paste0("c:/Users/", name, "/", mcsim, "/sim")
     }
@@ -68,8 +68,8 @@ compile_model <- function (mName, application = 'mcsim', use_model_file = TRUE, 
       } else stop("* Error in model compilation.")
 
     } else if ((.Platform$OS.type == "windows")) {
-      Sys.setenv(PATH = paste("c:\\Rtools\\mingw_64\\bin", Sys.getenv("PATH"), sep=";"))
-      Sys.setenv(PATH = paste("c:\\MinGW\\bin", Sys.getenv("PATH"), sep=";"))
+      Sys.setenv(PATH = paste("c:/Rtools/mingw_64/bin", Sys.getenv("PATH"), sep=";"))
+      Sys.setenv(PATH = paste("c:/Rtools/bin", Sys.getenv("PATH"), sep=";"))
       system(paste0(mod, " ", mName, " ", mName, ".c"))
       system(paste0("gcc -O3 -I.. -I", sim, " -o mcsim.", mName, ".exe ", mName, ".c ", sim, "/*.c", " -lm "))
       if (file.exists(paste0("mcsim.", mName, ".exe"))){
@@ -80,6 +80,8 @@ compile_model <- function (mName, application = 'mcsim', use_model_file = TRUE, 
   } else if (application == "R"){
     if (.Platform$OS.type == "windows" && use_model_file == T){
       system(paste0(mod, " -R ", mName, ".model ", mName, ".c"))
+      Sys.setenv(PATH = paste("c:/Rtools/mingw_64/bin", Sys.getenv("PATH"), sep=";"))
+      Sys.setenv(PATH = paste("c:/Rtools/bin", Sys.getenv("PATH"), sep=";"))
     }
 
     system (paste0("R CMD SHLIB ", mName, ".c")) # create .o and .so (or .dll) files
