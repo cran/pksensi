@@ -12,7 +12,7 @@
 
 <meta name="author" content="Nan-Hung Hsieh" />
 
-<meta name="date" content="2019-06-30" />
+<meta name="date" content="2019-08-19" />
 
 <title>Acetaminophen-PBPK model</title>
 
@@ -303,7 +303,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Acetaminophen-PBPK model</h1>
 <h4 class="author">Nan-Hung Hsieh</h4>
-<h4 class="date">2019-06-30</h4>
+<h4 class="date">2019-08-19</h4>
 
 
 
@@ -325,15 +325,15 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb2-13" title="13"></a>
 <a class="sourceLine" id="cb2-14" title="14">rng &lt;-<span class="st"> </span><span class="fl">1.96</span> </a></code></pre></div>
 <p>Generally, wide range of parameter value might cause the computing error when solving the differentiial equation. One of the effective ways to prevent this problem is to adjust the value of relative and absolute error tolerance to control the error appearance by resetting these parameters in a lower value. The <code>generate_infile</code> and <code>solve_mcsim</code> provide the arguments of <code>rtol</code> and <code>atol</code> that adjust the error tolerance to prevent the unwanted error. However, the modification will decrease the computing speed. Therefore, the alternative method to prevent this issue is to detect the crucial parameter range that causes the problem. Also, setting the maximum number of steps to higher value instead of using the default value (500) in <strong>GNU MCSim</strong> can prevent this problem (internally defined). The maximum number of step is set to 5000 in this case. Here we seperate the global SA of APAP-PBPK model process to several steps.</p>
-<div id="prepare-and-compile-the-model-file" class="section level3">
-<h3>Prepare and compile the model file</h3>
+<div id="prepare-and-compile-the-model-file" class="section level2">
+<h2>Prepare and compile the model file</h2>
 <p>The model code needs to be prepared in the following global SA workflow. After creating the <code>pbpk_apap.model</code> file in the working directory, the next step is to generate the executable program (<code>mcsim.pbpk_apap</code>) through <code>compile_model</code> function.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">mName &lt;-<span class="st"> &quot;pbpk_apap&quot;</span></a>
 <a class="sourceLine" id="cb3-2" title="2"><span class="kw">pbpk_apap_model</span>()</a>
 <a class="sourceLine" id="cb3-3" title="3"><span class="kw">compile_model</span>(mName, <span class="dt">application =</span> <span class="st">&quot;mcsim&quot;</span>)</a></code></pre></div>
 </div>
-<div id="define-the-parameter-and-its-distribution" class="section level3">
-<h3>Define the parameter and its distribution</h3>
+<div id="define-the-parameter-and-its-distribution" class="section level2">
+<h2>Define the parameter and its distribution</h2>
 <p>The 21 testing model parameters are defined in this part, including parameter name, probability distribution, and distributed parameter value. To prevent the computing error, the range of <code>SULT_VmaxC</code> and <code>UGT_VmaxC</code> need to adjust from <span class="math inline">\(U(0, 15)\)</span> <span class="citation">(Zurlinden and Reisfeld 2016)</span> to <span class="math inline">\(U(0, 10)\)</span> <span class="citation">(Hsieh et al. 2018)</span>. The objects <code>q</code> and <code>dist</code> are set to the type of distribution that will use to generate the parameter matrix in <strong>GNU MCSim</strong> (for uncertainty analysis) and R (for SA).</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">params &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;lnTg&quot;</span>, <span class="st">&quot;lnTp&quot;</span>, <span class="st">&quot;lnCYP_Km&quot;</span>,<span class="st">&quot;lnCYP_VmaxC&quot;</span>,</a>
 <a class="sourceLine" id="cb4-2" title="2">           <span class="st">&quot;lnSULT_Km_apap&quot;</span>,<span class="st">&quot;lnSULT_Ki&quot;</span>,<span class="st">&quot;lnSULT_Km_paps&quot;</span>,<span class="st">&quot;lnSULT_VmaxC&quot;</span>,</a>
@@ -355,8 +355,8 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb4-18" title="18">             <span class="kw">list</span>(<span class="fl">7.</span>, <span class="dv">15</span>), <span class="kw">list</span>(<span class="fl">0.</span>, <span class="dv">13</span>), <span class="kw">list</span>(<span class="fl">0.</span>, <span class="dv">13</span>),</a>
 <a class="sourceLine" id="cb4-19" title="19">             <span class="kw">list</span>(<span class="op">-</span><span class="fl">6.</span>, <span class="dv">1</span>), <span class="kw">list</span>(<span class="op">-</span><span class="fl">6.</span>, <span class="dv">1</span>), <span class="kw">list</span>(<span class="op">-</span><span class="fl">6.</span>, <span class="dv">1</span>))</a></code></pre></div>
 </div>
-<div id="define-additional-input-condition-and-output-time-and-variables" class="section level3">
-<h3>Define additional input condition and output time and variables</h3>
+<div id="define-additional-input-condition-and-output-time-and-variables" class="section level2">
+<h2>Define additional input condition and output time and variables</h2>
 <p>To optimize the computing speed, this case only uses <strong>GNU MCSim</strong> to estimate the concentration of APAP and its metabolites glucuronide (APAP-G) and sulfate (APAP-S) in plasma. The setting oral dose of APAP is 20 mg/kg in this example. Generally, the input dosing method can be defined through the <code>condition</code> argument. Since the unit of the given dose is mg/kg, the <code>mgkg_flag</code> is set to 1. More definition of input schedule functions can be found in the section of input functions in <strong>GNU MCSim</strong> User’s Manual (<a href="https://www.gnu.org/software/mcsim/mcsim.html#Input-functions" class="uri">https://www.gnu.org/software/mcsim/mcsim.html#Input-functions</a>).</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">conditions &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;mgkg_flag = 1&quot;</span>,</a>
 <a class="sourceLine" id="cb5-2" title="2">                <span class="st">&quot;OralExp_APAP = NDoses(2, 1, 0, 0, 0.001)&quot;</span>,</a>
@@ -364,8 +364,8 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb5-4" title="4">vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;lnCPL_APAP_mcgL&quot;</span>, <span class="st">&quot;lnCPL_AG_mcgL&quot;</span>, <span class="st">&quot;lnCPL_AS_mcgL&quot;</span>)</a>
 <a class="sourceLine" id="cb5-5" title="5">times &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dt">from =</span> <span class="fl">0.1</span>, <span class="dt">to =</span> <span class="fl">12.1</span>, <span class="dt">by =</span> <span class="fl">0.2</span>)</a></code></pre></div>
 </div>
-<div id="uncertainty-analysis" class="section level3">
-<h3>Uncertainty analysis</h3>
+<div id="uncertainty-analysis" class="section level2">
+<h2>Uncertainty analysis</h2>
 <p>We apply uncertainty analysis through the <code>solve_mcsim</code> and visualize the result by <code>pksim</code> function. Some example data are included in the <strong>pksensi</strong> with experiment time (h) and concentration (mg/L).</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">head</span>(APAP)</a></code></pre></div>
 <p>In the setting condition of simulation, The relative and absolute error tolerance (<code>rtol</code> &amp; <code>atol</code>) were set to 1e-7 and 1e-9, respectively, to prevent the computating error. The Monte Carlo simulation is run for 1000 iteration as the assignment of <code>monte_carlo</code>. The input file (‘sim.in’) and output file (‘simmc.out’) will be generated under the standard ASCII format.</p>
@@ -385,14 +385,14 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb8-9" title="9"><span class="kw">points</span>(APAP<span class="op">$</span>Time, <span class="kw">log</span>(APAP<span class="op">$</span>AS <span class="op">*</span><span class="st"> </span><span class="dv">1000</span>))</a></code></pre></div>
 <p>For parent compound, all data points are located in the simulated interval of 25-75%. Through this result, we can determine that the simulated outputs can accurately generate the same concentration profile as the in-vivo experiment under the setting of parameter ranges for APAP. The simulated result of metabolites APAP-G shows the different pharmacokinetic profile with experiment data. However, all data points are located in the simulated interval.</p>
 </div>
-<div id="generate-parameter-matrix" class="section level3">
-<h3>Generate parameter matrix</h3>
+<div id="generate-parameter-matrix" class="section level2">
+<h2>Generate parameter matrix</h2>
 <p>In global SA, we have to additionally generate the parameter matrix from the eFAST method. The current setting uses 512 sample size with 10 replication.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw">set.seed</span>(<span class="dv">1234</span>)</a>
 <a class="sourceLine" id="cb9-2" title="2">x &lt;-<span class="st"> </span><span class="kw">rfast99</span>(<span class="dt">params =</span> params, <span class="dt">n =</span> <span class="dv">512</span>, <span class="dt">q =</span> q, <span class="dt">q.arg =</span> q.arg, <span class="dt">replicate =</span> <span class="dv">10</span>) </a></code></pre></div>
 </div>
-<div id="conduct-the-global-sa" class="section level3">
-<h3>Conduct the global SA</h3>
+<div id="conduct-the-global-sa" class="section level2">
+<h2>Conduct the global SA</h2>
 <p>To conduct the global SA with <strong>GNU MCsim</strong> and <strong>pksensi</strong>, the input file with given “setpoint” condition should be generated before modeling. The file can create by <code>generate_infile</code> function. The <code>solve_mcsim</code> can also automatically create the input file and compute the output.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">out &lt;-<span class="st"> </span><span class="kw">solve_mcsim</span>(x, <span class="dt">mName =</span> mName,</a>
 <a class="sourceLine" id="cb10-2" title="2">                   <span class="dt">params =</span> params, </a>
@@ -401,8 +401,8 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb10-5" title="5">                   <span class="dt">condition =</span> conditions, </a>
 <a class="sourceLine" id="cb10-6" title="6">                   <span class="dt">rtol =</span> <span class="fl">1e-7</span>, <span class="dt">atol =</span> <span class="fl">1e-9</span>)</a></code></pre></div>
 </div>
-<div id="visualization-and-decision" class="section level3">
-<h3>Visualization and decision</h3>
+<div id="visualization-and-decision" class="section level2">
+<h2>Visualization and decision</h2>
 <p>The plotting function can create the result of time-dependent sensitivity measurement to determine the parameter impact on model output over time.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">plot</span>(out, <span class="dt">vars =</span> <span class="st">&quot;lnCPL_APAP_mcgL&quot;</span>)</a></code></pre></div>
 <p>In addition, through using the <code>check</code>, the parameter with sensitivity and convergence indices over the given condition can be preliminary detected for all output variables. Based on our previous study, we proposed the heatmap visualization approach <code>heat_check</code> to distinguish “influential” and “non-influential” parameters with a “cut-off” point. Through the given argument <code>order</code>, we can select the specific order of sensitivity measurement that we’re interested in.</p>
