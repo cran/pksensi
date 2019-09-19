@@ -1,26 +1,28 @@
-#' Install MCSim
+#' Install \pkg{GNU MCSim}
 #'
-#' Download the latest or specific version of GNU MCSim from the official website
+#' Download the latest or specific version of \pkg{GNU MCSim} from the official website
 #' (\url{https://www.gnu.org/software/mcsim/}) and install it to the system directory.
 #'
-#' This function aims to help users install GNU MCSim more easily.
+#' This function aims to help users install \pkg{GNU MCSim} more easily.
 #' However, if you can not install it through this function.
-#' You might need to follow the instruction of GNU MCSim and install it,
-#' manually: \url{https://www.gnu.org/software/mcsim/mcsim.html#Installation}
+#' The additional way is to follow the instruction and install it manually:
+#' \url{https://www.gnu.org/software/mcsim/mcsim.html#Installation}
 #'
-#' The default \code{mxstp} is setting to 500.
+#' The default \code{mxstp} is setting to 5000.
 #' The user can increase \code{mxstp} to avoid possible error return.
-#' If you meet any error when conduct sensitivity analysis, you can this function to reinstall GNU MCSim and set the higher \code{mxstp}.
-#' The default \code{directory} to install MCSim is under \code{/home/username} (Linux), \code{/Users/username} (MacOS),
-#' and \code{C:/Users/} (windows). To install MCSim in Windows, be sure to install Rtools or MinGW first.
+#' If you meet any error when conduct sensitivity analysis,
+#' you can this function to reinstall \pkg{GNU MCSim} and set the higher \code{mxstp}.
+#' The default installed \code{directory} is under \code{/home/username} (Linux),
+#' \code{/Users/username} (MacOS),
+#' and \code{C:/Users/} (windows). To install \pkg{GNU MCSim} in Windows, be sure to install Rtools first.
 #'
 #' @references
-#' F.Y. Bois, and D. Maszle, 1997,
-#' MCSim: A Monte Carlo Simulation Program,
+#' Bois, F. Y., & Maszle, D. R. (1997).
+#' MCSim: a Monte Carlo simulation program.
 #' \emph{Journal of Statistical Software}, 2(9): 1–60.
 #'
-#' @param version a character of MCSim version number.
-#' @param directory a character to assign the directory to put the GNU MCSim files.
+#' @param version a character of version number.
+#' @param directory a character to assign the installed directory.
 #' @param mxstep a numeric value to assign the maximum number of (internally defined) steps
 #' allowed during one call to the solver.
 #'
@@ -122,7 +124,7 @@ mcsim_install <- function(version = "6.1.0", directory = NULL, mxstep = 5000) {
 
 
 #' @export
-#' @describeIn mcsim Return the version number of GNU MCSim.
+#' @describeIn mcsim Return the version number.
 mcsim_version <- function(){
 
   if (.Platform$OS.type == "unix"){

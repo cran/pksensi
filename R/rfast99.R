@@ -1,25 +1,27 @@
 #' Extended Fourier Amplitude Sensitivity Test with Random Phase Shift
 #'
-#' \code{rfast99} is used to create the sequances for each parameter.
-#' It is based on the \code{fast99} function in \pkg{sensitivity} package.
+#' Applying the extended Fourier amplitude sensitivity Test algorithm to create the numeric sequences for each parameter (Saltelli et al. 1999).
+#' Each sequence is random generated based on the random phase shift approach.
+#' It is an extension based on the \code{fast99} function in \pkg{sensitivity} package.
 #'
 #' @importFrom stats runif fft var
 #'
-#' @param params an integer for the giving number of parameters, or a vector of character strings giving their names.
-#' @param n an integer for the sampling number.
+#' @param params an integer for the giving number of parameters,
+#' or a vector of character strings giving their names.
+#' @param n an integer for the sampling size.
 #' @param M an integer specifying the interference parameter. The default is 4.
 #' @param omega a vector giving the set of frequencies.
 #' @param q a vector of quantile functions names corresponding to wanted parameters distributions.
 #' @param q.arg a list of quantile functions parameters.
-#' @param replicate an integer to define the number of replication. The default is set to 1 turn off the replication.
+#' @param replicate an integer to define the number of replication. The default is 5.
 #' @param conf the confidence level for replication confidence intervals. The default is 0.95.
 #'
 #' @references
-#' A. Saltelli, S. Tarantola and K. Chan, 1999, A quantitative, model independent method for
-#' global sensitivity analysis of model output,
+#' Saltelli, A., Tarantola, S., & Chan, K. S. (1999).
+#' A quantitative model-independent method for global sensitivity analysis of model output.
 #' \emph{Technometrics}, 41, 39-56.
 #'
-#' R. I. Cukier, H. B. Levine and K. E. Schuler, 1978,
+#' Cukier, R. I., Levine, H. B., & Shuler, K. E. (1978).
 #' Nonlinear sensitivity analysis of multiparameter model systems.
 #' \emph{Journal of Computational Physics}, 26, 1–42.
 #'
@@ -44,7 +46,7 @@
 #'
 #' @export
 rfast99 <- function(params, n, M = 4, omega = NULL,
-                    q = NULL, q.arg = NULL, replicate = 1, conf = 0.95) {
+                    q = NULL, q.arg = NULL, replicate = 5, conf = 0.95) {
 
   # params numbers and names
 

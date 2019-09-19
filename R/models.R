@@ -1,26 +1,27 @@
 #' Example PK Model for Sensitivity Analysis
 #'
+#' The example PK model that were used in sensitivity testing.
 #' Three examples are included: Flip-flop pharmacokinetic model,
 #' one-compartment toxicokinetic model from \pkg{httk} (Pearce et al. 2017),
 #' and acetaminophen pharmacokinetic model (Zurlinden et al. 2016).
 #'
-#' @param time the given time-points.
-#' @param params a parameter matrix containing the input sample.
-#' @param dose a given dose.
+#' @param time a numeric vector to define the given time point(s).
+#' @param params a numeric vector to define the input parameter value.
+#' @param dose a numeric value to define the given dose in flip-flop model.
 #'
 #' @name models
 #' @aliases models
 #' @rdname models
 #'
 #' @references
-#' R. Pearce, R. Setzer, C. Strope, N. Sipes and J. Wambaugh, 2017,
-#' httk: R Package for High-Throughput Toxicokinetics,
+#' Pearce, R. G., Setzer, R. W., Strope, C. L., Wambaugh, J. F., & Sipes, N. S. (2017).
+#' httk: R package for high-throughput toxicokinetics.
 #' \emph{Journal of Statistical Software}, 79(4), 1-26.
 #'
-#' T. J. Zurlinden and B. Reisfeld, 2016,
-#' Physiologically based modeling of the pharmacokinetics of acetaminophen
-#' and its major metabolites in humans using a Bayesian population approach,
-#' \emph{European Journal of Drug Metabolism and Pharmacokinetics}, 79(4), 1-26.
+#' Zurlinden, T. J., & Reisfeld, B. (2016).
+#' Physiologically based modeling of the pharmacokinetics of acetaminophen and
+#' its major metabolites in humans using a Bayesian population approach.
+#' \emph{European journal of drug metabolism and pharmacokinetics}, 41(3), 267-280.
 #'
 #' @examples
 #' params <- c(F = 0.9, KA = 1.2, KE = 0.2, V = 1.5)

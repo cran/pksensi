@@ -2,7 +2,7 @@
 % Please edit documentation in R/pksim.R
 \name{pksim}
 \alias{pksim}
-\title{Pharmacokinetic Simulation from Sampling Parameter}
+\title{PK Simulation from Sampling Parameter}
 \usage{
 pksim(y, vars = 1, log = F, legend = T, ...)
 }
@@ -18,8 +18,8 @@ pksim(y, vars = 1, log = F, legend = T, ...)
 \item{...}{additional arguments to customize the graphical parameters.}
 }
 \description{
-Pharmacokinetic plot of the output results based on the given parameter (Uncertainty analysis).
-If the user define the multiple output in model, the generated result will based on
-first model variable (default). A pharmacokinetic plot with median and the range
-of min-max, 10%-90%, and 25%-75%.
+Create the PK profile of the output results based on the given parameter (uncertainty analysis).
+This function is used to visualize the corresponding output PK profile from the input parameters in sensitivity analysis.
+If there are multiple outputs in model, the generated result will be the first model variable (default).
+A PK plot is generated with median, 25\%-75\%, 10\%-90\%, and minimum-maximum.
 }
