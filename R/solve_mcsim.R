@@ -108,11 +108,16 @@ solve_mcsim <- function(x, mName,
     setpoint.data <- "setpts.out"
   } else setpoint.data <- setpoint.name
 
+  mStr <- strsplit(mName, "/")
+  mName <- mStr[[1]][length(mStr[[1]])]
   if (.Platform$OS.type == "unix"){
     mcsim. <- paste0("mcsim.", mName)
   } else if (.Platform$OS.type == "windows"){ # Windows user but not MCSim under R
     mcsim. <- paste0("mcsim.", mName, ".model.exe")
   }
+
+  if(length(mStr[[1]]) != 1) mdir <- paste(mStr[[1]][-length(mStr[[1]])], collapse = "/")
+  if(exists("mdir")) mcsim. <- paste0(mdir, "/",mcsim.)
 
   if(file.exists(mcsim.) == F){ # Design for MCSim under R
     mcsim. <- paste0("mcsim.", mName, ".exe")
@@ -143,9 +148,15 @@ solve_mcsim <- function(x, mName,
     write.table(X, file=setpoint.data, row.names=F, sep="\t")
   }
 
+
   if(file.exists(mcsim.) == T){
-    message(paste0("Execute: ", "./", mcsim., " ", infile.name))
-    system(paste0("./", mcsim., " ", infile.name))
+    if(length(mStr[[1]]) == 1){
+      message(paste0("Execute: ", "./", mcsim., " ", infile.name))
+      system(paste0("./", mcsim., " ", infile.name))
+    } else {
+      message(paste0("Execute: ", mcsim., " ", infile.name))
+      system(paste0(mcsim., " ", infile.name))
+    }
   }
 
   if (is.null(monte_carlo)){rm(X)}

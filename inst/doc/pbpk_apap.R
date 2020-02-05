@@ -1,15 +1,19 @@
 ## ----setup, include = FALSE----------------------------------------------
 library(pksensi)
-#mcsim_install(mxstep = 5000)
-#library(kableExtra)
+#mcsim_install()
+
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  fig.height=5, 
-  fig.width=8,
+  eval = F,
+  dev = "png",
+  dpi = 200,
+  fig.align = "center",
+  fig.width = 7,
+  out.width = "90%",
+  fig.height = 4,
   comment = "#>"
 )
 
-## ---- echo=F, eval=F-----------------------------------------------------
+## ---- echo=F-------------------------------------------------------------
 #  #Nominal value
 #  Tg <- log(0.23)
 #  Tp <- log(0.033)
@@ -79,7 +83,7 @@ knitr::opts_chunk$set(
 #  #}
 #  
 
-## ---- eval=F-------------------------------------------------------------
+## ------------------------------------------------------------------------
 #  # Nominal value
 #  Tg <- log(0.23)
 #  Tp <- log(0.033)
@@ -95,12 +99,12 @@ knitr::opts_chunk$set(
 #  
 #  rng <- 1.96
 
-## ---- eval=F-------------------------------------------------------------
+## ------------------------------------------------------------------------
 #  mName <- "pbpk_apap"
 #  pbpk_apap_model()
 #  compile_model(mName, application = "mcsim")
 
-## ---- eval=F-------------------------------------------------------------
+## ------------------------------------------------------------------------
 #  params <- c("lnTg", "lnTp", "lnCYP_Km","lnCYP_VmaxC",
 #             "lnSULT_Km_apap","lnSULT_Ki","lnSULT_Km_paps","lnSULT_VmaxC",
 #             "lnUGT_Km","lnUGT_Ki","lnUGT_Km_GA","lnUGT_VmaxC",
@@ -121,24 +125,24 @@ knitr::opts_chunk$set(
 #               list(7., 15), list(0., 13), list(0., 13),
 #               list(-6., 1), list(-6., 1), list(-6., 1))
 
-## ---- eval=F-------------------------------------------------------------
+## ------------------------------------------------------------------------
 #  conditions <- c("mgkg_flag = 1",
 #                  "OralExp_APAP = NDoses(2, 1, 0, 0, 0.001)",
 #                  "OralDose_APAP_mgkg = 20.0")
 #  vars <- c("lnCPL_APAP_mcgL", "lnCPL_AG_mcgL", "lnCPL_AS_mcgL")
 #  times <- seq(from = 0.1, to = 12.1, by = 0.2)
 
-## ---- eval=F-------------------------------------------------------------
+## ------------------------------------------------------------------------
 #  head(APAP)
 
-## ---- eval=F-------------------------------------------------------------
+## ------------------------------------------------------------------------
 #  set.seed(1111)
 #  out <- solve_mcsim(mName = mName, params = params, vars = vars,
 #                     monte_carlo = 1000, dist = dist, q.arg = q.arg,
 #                     time = times, condition = conditions,
 #                     rtol = 1e-7, atol = 1e-9)
 
-## ---- eval=F, fig.cap = '**Figure 1.** Coverage checks of prior PBPK model predictions with calibrated APAP data', fig.height=3.5, fig.width=9----
+## ---- fig.height=3.5, fig.width=9----------------------------------------
 #  par(mfrow = c(1,3), mar = c(4,4,1,1))
 #  pksim(out, xlab = "Time (h)", ylab = "Conc. (ug/L)", main = "APAP")
 #  points(APAP$Time, log(APAP$APAP * 1000))
@@ -149,11 +153,11 @@ knitr::opts_chunk$set(
 #        ylab = " ", legend = FALSE)
 #  points(APAP$Time, log(APAP$AS * 1000))
 
-## ---- eval=F-------------------------------------------------------------
+## ------------------------------------------------------------------------
 #  set.seed(1234)
 #  x <- rfast99(params = params, n = 512, q = q, q.arg = q.arg, replicate = 10)
 
-## ---- eval=F-------------------------------------------------------------
+## ------------------------------------------------------------------------
 #  out <- solve_mcsim(x, mName = mName,
 #                     params = params,
 #                     time = times,
@@ -161,12 +165,12 @@ knitr::opts_chunk$set(
 #                     condition = conditions,
 #                     rtol = 1e-7, atol = 1e-9)
 
-## ---- eval=F, fig.cap = '**Figure 2.** Time-dependent SI of the plasma APAP concentration estimated from APAP-PBPK model during 12-hr time period post intake.', fig.height=8, fig.width=8----
+## ---- fig.height=8, fig.width=8------------------------------------------
 #  plot(out, vars = "lnCPL_APAP_mcgL")
 
-## ---- eval=F, fig.cap = '**Figure 3.** Heat map representation of time-dependent total SI computed for global SA method', fig.height=5----
+## ---- fig.height=5-------------------------------------------------------
 #  heat_check(out, order = "total order")
 
-## ---- eval=F, fig.cap = '**Figure 4.** Heat map representation of time-dependent total CI computed for global SA method', fig.height=5----
+## ---- fig.height=5-------------------------------------------------------
 #  heat_check(out, index = "CI", order = "total order")
 
