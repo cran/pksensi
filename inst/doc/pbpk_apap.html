@@ -8,11 +8,11 @@
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Nan-Hung Hsieh" />
 
-<meta name="date" content="2020-02-05" />
+<meta name="date" content="2020-05-04" />
 
 <title>Acetaminophen-PBPK model</title>
 
@@ -117,9 +117,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -288,7 +285,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -303,7 +301,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Acetaminophen-PBPK model</h1>
 <h4 class="author">Nan-Hung Hsieh</h4>
-<h4 class="date">2020-02-05</h4>
+<h4 class="date">2020-05-04</h4>
 
 
 <div id="TOC">
@@ -418,8 +416,8 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <p>The plotting function can create the result of time-dependent sensitivity measurement to determine the parameter impact on model output over time.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">plot</span>(out, <span class="dt">vars =</span> <span class="st">&quot;lnCPL_APAP_mcgL&quot;</span>)</a></code></pre></div>
 <p>In addition, through using the <code>check</code>, the parameter with sensitivity and convergence indices over the given condition can be preliminary detected for all output variables. Based on our previous study, we proposed the heatmap visualization approach <code>heat_check</code> to distinguish “influential” and “non-influential” parameters with a “cut-off” point. Through the given argument <code>order</code>, we can select the specific order of sensitivity measurement that we’re interested in.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw">heat_check</span>(out, <span class="dt">order =</span> <span class="st">&quot;total order&quot;</span>)</a></code></pre></div>
-<p>Adding the <code>index = &quot;CI&quot;</code> in the function can further investigate the convergence index. Based on the current setting of sampling size, most parameters cannot reach the acceptable criteria of convergence. Therefore, a higher number of sampling is necessary. The sample size of convergence in the current PBPK model is 8,192 <span class="citation">(Hsieh et al. 2018)</span>. However, based on the current sample size we still can find 6 parameters that can be an important parameter for the plasma APAP concentration.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw">heat_check</span>(out, <span class="dt">order =</span> <span class="st">&quot;total order&quot;</span>, <span class="dt">show.all =</span> T)</a></code></pre></div>
+<p>In the default setting, the <code>heat_check</code> can only show the influential parameters. The argument <code>show.all</code> is used to show all results. Adding the <code>index = &quot;CI&quot;</code> in the function can further investigate the convergence index. Based on the current setting of sampling size, most parameters cannot reach the acceptable criteria of convergence. Therefore, a higher number of sampling is necessary. The sample size of convergence in the current PBPK model is 8,192 <span class="citation">(Hsieh et al. 2018)</span>. However, based on the current sample size we still can find 6 parameters that can be an important parameter for the plasma APAP concentration.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw">heat_check</span>(out, <span class="dt">index =</span> <span class="st">&quot;CI&quot;</span>, <span class="dt">order =</span> <span class="st">&quot;total order&quot;</span>)</a></code></pre></div>
 </div>
 <div id="references" class="section level2 unnumbered">

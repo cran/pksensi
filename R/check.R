@@ -18,6 +18,8 @@
 #' @param index a character to choose sensitivity index \code{SI} (default) or convergence index \code{CI}.
 #' @param level a logical value to use continuous or discrete (default) output.
 #' @param text a logical value to display the calculated indices in the plot.
+#' @param out a logical value to print the checking result to the console.
+#' @param show.all a logical value to show all testing parameters in the heatmap. The default is set to \code{FALSE} to show only the influential parameters.
 #' @param ... additional arguments to customize the graphical parameters.
 #'
 #' @importFrom reshape melt
@@ -69,18 +71,18 @@
 #' # Check results of sensitivity measures
 #' check(out)
 #' plot(out)
-#' heat_check(out)
+#' heat_check(out, show.all = T)
 #' heat_check(out, index = "CI")
 #'
 #' @seealso \code{\link{tell2}}
 #'
 #' @rdname check
 #' @export
-check <- function(x, times, vars, SI.cutoff, CI.cutoff) UseMethod("check")
+check <- function(x, times, vars, SI.cutoff, CI.cutoff, out) UseMethod("check")
 
 #' @method check rfast99
 #' @export
-check.rfast99 <- function(x, times = NULL, vars = NULL, SI.cutoff = 0.05, CI.cutoff = 0.05){
+check.rfast99 <- function(x, times = NULL, vars = NULL, SI.cutoff = 0.05, CI.cutoff = 0.05, out = TRUE){
 
   if (is.null(times)) times <- dimnames(x$y)[[3]]
   if (is.null(vars)) vars <- dimnames(x$y)[[4]]
@@ -132,21 +134,25 @@ check.rfast99 <- function(x, times = NULL, vars = NULL, SI.cutoff = 0.05, CI.cut
   #    tCI <- x$tCI
   #  }
 
-  cat("\nSensitivity check ( Index >", SI.cutoff, ")\n")
-  cat("----------------------------------")
-  cat("\nFirst order:\n", names(which(mSI > SI.cutoff)), "\n")
-  cat("\nInteraction:\n", names(which(iSI > SI.cutoff)), "\n")
-  cat("\nTotal order:\n", names(which(tSI > SI.cutoff)), "\n")
-  cat("\nUnselected factors in total order:\n", names(which(tSI <= SI.cutoff)), "\n")
-  cat("\n")
+  if (out) {
+    cat("\nSensitivity check ( Index >", SI.cutoff, ")\n")
+    cat("----------------------------------")
+    cat("\nFirst order:\n", names(which(mSI > SI.cutoff)), "\n")
+    cat("\nInteraction:\n", names(which(iSI > SI.cutoff)), "\n")
+    cat("\nTotal order:\n", names(which(tSI > SI.cutoff)), "\n")
+    cat("\nUnselected factors in total order:\n", names(which(tSI <= SI.cutoff)), "\n")
+    cat("\n")
 
-  cat("\nConvergence check ( Index >", CI.cutoff, ")\n")
-  cat("----------------------------------")
-  cat("\nFirst order:\n", names(which(mCI > CI.cutoff)), "\n")
-  cat("\nInteraction:\n", names(which(iCI > CI.cutoff)), "\n")
-  cat("\nTotal order:\n", names(which(tCI > CI.cutoff)), "\n")
-  cat("\n")
+    cat("\nConvergence check ( Index >", CI.cutoff, ")\n")
+    cat("----------------------------------")
+    cat("\nFirst order:\n", names(which(mCI > CI.cutoff)), "\n")
+    cat("\nInteraction:\n", names(which(iCI > CI.cutoff)), "\n")
+    cat("\nTotal order:\n", names(which(tCI > CI.cutoff)), "\n")
+    cat("\n")
+  }
 
+  x <- list(mSI = names(which(mSI > SI.cutoff)), iSI = names(which(iSI > SI.cutoff)), tSI = names(which(tSI > SI.cutoff)),
+            mCI = names(which(mCI > CI.cutoff)), iCI = names(which(iCI > CI.cutoff)), tCI = names(which(tCI > CI.cutoff)))
 }
 
 #' @rdname check
@@ -155,7 +161,7 @@ heat_check <- function(x,
                        order = c("first order", "interaction", "total order"),
                        vars = NULL, times = NULL,
                        SI.cutoff = c(0.05, 0.1), CI.cutoff = c(0.05, 0.1),
-                       index = "SI", level = T, text = F){
+                       index = "SI", level = T, text = F, show.all = FALSE){
 
   nSI <- length(SI.cutoff)
   SI.labels<-rep(NA, nSI+1)
@@ -178,6 +184,12 @@ heat_check <- function(x,
   if (index ==  "SI"){
     X <- tidy_index(x, index = index) %>%
       mutate(level = cut(.data$value, breaks=c(-Inf, paste(SI.cutoff), Inf), labels=SI.labels))
+
+    if (!(show.all == TRUE)) {
+      check.out <- check.rfast99(x, out = F)
+      X <- X %>% filter(.data$parameter %in% check.out$tSI)
+    }
+
   } else if ((index == "CI")) {
     X <- tidy_index(x, index = index) %>%
       mutate(level = cut(.data$value, breaks=c(-Inf, paste(CI.cutoff), Inf), labels=CI.labels))
@@ -208,7 +220,7 @@ heat_check <- function(x,
   }
 
   #if (order == F){
-    p <- ggplot(X, aes_string("time", "parameter"))
+     p <- ggplot(X, aes_string("time", "parameter"))
   #} else if (order == T) {
   #  p <- ggplot(X, aes_string("time", "reorder(parameter, value)"))
   #}

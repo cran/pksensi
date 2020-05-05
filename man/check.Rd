@@ -7,11 +7,20 @@
 \alias{print.rfast99}
 \title{Check the Parameter Sensitivity}
 \usage{
-check(x, times, vars, SI.cutoff, CI.cutoff)
+check(x, times, vars, SI.cutoff, CI.cutoff, out)
 
-heat_check(x, order = c("first order", "interaction", "total order"),
-  vars = NULL, times = NULL, SI.cutoff = c(0.05, 0.1),
-  CI.cutoff = c(0.05, 0.1), index = "SI", level = T, text = F)
+heat_check(
+  x,
+  order = c("first order", "interaction", "total order"),
+  vars = NULL,
+  times = NULL,
+  SI.cutoff = c(0.05, 0.1),
+  CI.cutoff = c(0.05, 0.1),
+  index = "SI",
+  level = T,
+  text = F,
+  show.all = FALSE
+)
 
 \method{plot}{rfast99}(x, vars = 1, SI.cutoff = 0.1, ...)
 
@@ -28,6 +37,8 @@ heat_check(x, order = c("first order", "interaction", "total order"),
 
 \item{CI.cutoff}{a value or vector to set the cut-off for convergence index. The default is 0.05.}
 
+\item{out}{a logical value to print the checking result to the console.}
+
 \item{order}{a vector of the interested output index, including \code{first order}, \code{interaction}, and \code{total order}.}
 
 \item{index}{a character to choose sensitivity index \code{SI} (default) or convergence index \code{CI}.}
@@ -35,6 +46,8 @@ heat_check(x, order = c("first order", "interaction", "total order"),
 \item{level}{a logical value to use continuous or discrete (default) output.}
 
 \item{text}{a logical value to display the calculated indices in the plot.}
+
+\item{show.all}{a logical value to show all testing parameters in the heatmap. The default is set to \code{FALSE} to show only the influential parameters.}
 
 \item{...}{additional arguments to customize the graphical parameters.}
 }
