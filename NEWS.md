@@ -1,3 +1,11 @@
+# pksensi 1.1.7
+
+* Suggested to use Rtools40
+* Added parallel method in `solve_mcsim()`
+* Fixed bug in `heat_check()`
+* Added message of display info in `heat_check()` function
+* Improved `heat_check()` to display the indices based on the setting cut-off
+
 # pksensi 1.1.6
 
 * Improved `heat_check()` to only show influential parameters as default

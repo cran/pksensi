@@ -71,7 +71,7 @@
 #' # Check results of sensitivity measures
 #' check(out)
 #' plot(out)
-#' heat_check(out, show.all = T)
+#' heat_check(out, show.all = TRUE)
 #' heat_check(out, index = "CI")
 #'
 #' @seealso \code{\link{tell2}}
@@ -186,8 +186,9 @@ heat_check <- function(x,
       mutate(level = cut(.data$value, breaks=c(-Inf, paste(SI.cutoff), Inf), labels=SI.labels))
 
     if (!(show.all == TRUE)) {
-      check.out <- check.rfast99(x, out = F)
+      check.out <- check.rfast99(x, vars = vars, SI.cutoff = min(SI.cutoff), out = F)
       X <- X %>% filter(.data$parameter %in% check.out$tSI)
+      message(paste0("Display ", length(check.out$tSI), " influential parameters from all ", dim(x$a)[3], " examined parameters."))
     }
 
   } else if ((index == "CI")) {
@@ -220,7 +221,7 @@ heat_check <- function(x,
   }
 
   #if (order == F){
-     p <- ggplot(X, aes_string("time", "parameter"))
+  p <- ggplot(X, aes_string("time", "parameter"))
   #} else if (order == T) {
   #  p <- ggplot(X, aes_string("time", "reorder(parameter, value)"))
   #}
@@ -258,7 +259,11 @@ heat_check <- function(x,
   }
 
   if (text == T){
-    p + geom_text(aes_string(label = "ifelse(value < 0.01, '', round(value, 2))"), size = 2.5)
+    if (index ==  "SI"){
+      p + geom_text(aes_string(label = "ifelse(value < min(SI.cutoff), '', round(value, 2))"), size = 2.5)
+    } else if ((index == "CI")) {
+      p + geom_text(aes_string(label = "ifelse(value < min(CI.cutoff), '', round(value, 2))"), size = 2.5)
+    }
   } else p
 }
 
