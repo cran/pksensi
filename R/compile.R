@@ -15,7 +15,7 @@
 #' @param application a character to assign the specific methods (\code{mcsim} or \code{R})
 #' that will be applied to the numerical analysis (default is \code{mcsim}).
 #' @param version a character to assign the version of \pkg{GNU MCSim} that had been installed.
-#' The version must be assigned for Windows user (default is \code{6.1.0}).
+#' The version must be assigned for Windows user (default is \code{6.2.0}).
 #'
 #' @return
 #' The default \code{application} is set to \code{'mcsim'}
@@ -25,7 +25,7 @@
 #' shared objects (.so) on Unix-likes systems (e.g., Linux and MacOS) that can link with \pkg{deSolve} solver.
 #'
 #' @export
-compile_model <- function (mName, application = 'mcsim', use_model_file = TRUE, version = '6.1.0') {
+compile_model <- function (mName, application = 'mcsim', use_model_file = TRUE, version = '6.2.0') {
 
   if (application == 'mcsim' && .Platform$OS.type == "windows"){
     mName <- paste0(mName,".model")
@@ -56,8 +56,8 @@ compile_model <- function (mName, application = 'mcsim', use_model_file = TRUE, 
 
       exec <- paste0("mcsim.", mName)
       if (file.exists(exec)){
-        cat(paste0("* Created executable file 'mcsim.", mName, "'."))
-      } else stop("* Error in model compilation.")
+        cat(paste0("* Created executable file 'mcsim.", mName, "'.\n"))
+      } else stop("* Error in model compilation.\n")
 
     } else if ((.Platform$OS.type == "windows")) {
       Sys.setenv(PATH = paste("C:\\rtools40\\mingw64\\bin", Sys.getenv("PATH"), sep=";"))
@@ -93,3 +93,32 @@ compile_model <- function (mName, application = 'mcsim', use_model_file = TRUE, 
     source(paste0(mName, "_inits.R"))
   }
 }
+
+compile_model_pkg <- function(mName, application = 'mcsim', version = '6.2.0'){
+
+  if (.Platform$OS.type == "unix"){
+    exe_file <- paste0("mcsim.", mName)
+  } else if (.Platform$OS.type == "windows") exe_file <- paste0("mcsim.", mName, ".exe")
+
+  mcsimdir <- system.file("mcsim", package = "pksensi")
+  moddir <- paste0(mcsimdir, "/mcsim-", version, "/mod")
+  simdir <- paste0(mcsimdir, "/mcsim-", version, "/sim")
+  modpath <- paste0(moddir, "/mod.exe")
+
+  if (file.exists(modpath) == F) mcsim_pkg(version = version)
+
+  if (application == 'R'){
+    system(paste0(modpath, " -R ", mName, ".model ", mName, ".c"))
+    system (paste0("R CMD SHLIB ", mName, ".c")) # create *.dll files
+    dyn.load(paste(mName, .Platform$dynlib.ext, sep="")) # load *.dll
+    source(paste0(mName,"_inits.R"))
+  } else if (application == 'mcsim') {
+    system(paste0(modpath, " ", mName, ".model ", mName, ".c"))
+    message(paste0("Compiling..."))
+    system(paste0("gcc -O3 -I.. -I", simdir, " -o ", exe_file, " ", mName, ".c ", simdir, "/*.c -lm "))
+    invisible(file.remove(paste0(mName, ".c")))
+    if(file.exists(exe_file)) message(paste0("* Created executable program '", exe_file, "'."))
+  }
+}
+
+

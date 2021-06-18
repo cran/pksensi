@@ -1,6 +1,29 @@
 context("test-rfast99.R")
 
-test_that("rfast99 single_time", {
+test_that("rfast99 single_timepoint_no_replication", {
+
+  FFPK <- pksensi::FFPK
+
+  q = "qunif"
+  q.arg = list(list(min = 0.5, max = 1),
+               list(min = 0.5, max = 1.5),
+               list(min = 0.02, max = 0.3),
+               list(min = 20, max = 60))
+
+  set.seed(1234)
+  x<-rfast99(params=c("F","KA","KE","V"), n = 100, q = q, q.arg = q.arg,
+             rep = 1, conf = 0.95)
+  time <- 0.5
+  out<-solve_fun(x, model = FFPK, time = time, vars = "output")
+  check(out)
+  print(out)
+
+  expect_equal(dim(out$y)[2], 1)
+  expect_error(pksim(out), "The time point must greater than 1", fix = TRUE)
+})
+
+
+test_that("rfast99 single_timepoint_20_replicaiton", {
 
   FFPK <- pksensi::FFPK
 
@@ -41,11 +64,12 @@ test_that("rfast99 class", {
   check(out)
   print(out)
 
-  heat_check(out, text = T)
-  heat_check(out, level = F)
-  heat_check(out, index = "CI")
+  #heat_check(out, text = TRUE)
+  #heat_check(out, level = F)
+  #cheat_check(out, index = "CI")
 
-  expect_silent(pksim(out, log = T))
+  expect_silent(pksim(out))
+  expect_silent(pksim(out, log = TRUE))
   expect_silent(plot(out))
   expect_that(x, is_a("rfast99"))
   expect_equal(x$M, 4)
@@ -110,7 +134,7 @@ test_that("rfast99 rep2", {
              rep = 20, conf = 0.95)
 
   time <- c(0.5, 1)
-  out<-solve_fun(x, model = FFPK, time = time, vars = "output", lnparam = T)
+  out<-solve_fun(x, model = FFPK, time = time, vars = "output", lnparam = TRUE)
   check(out, time = 1)
   print(out)
 

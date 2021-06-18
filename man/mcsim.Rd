@@ -2,10 +2,13 @@
 % Please edit documentation in R/install.R
 \name{mcsim_install}
 \alias{mcsim_install}
+\alias{mcsim_pkg}
 \alias{mcsim_version}
-\title{Install \pkg{GNU MCSim}}
+\title{Download and install \pkg{GNU MCSim}}
 \usage{
 mcsim_install(version = "6.2.0", directory = NULL, mxstep = 5000)
+
+mcsim_pkg(version = "6.2.0")
 
 mcsim_version()
 }
@@ -30,13 +33,17 @@ The additional way is to follow the instruction and install it manually:
 The default \code{mxstp} is setting to 5000.
 The user can increase \code{mxstp} to avoid possible error return.
 If you meet any error when conduct sensitivity analysis,
-you can this function to reinstall \pkg{GNU MCSim} and set the higher \code{mxstp}.
+you can this function to re-install \pkg{GNU MCSim} and set the higher \code{mxstp}.
 The default installed \code{directory} is under \code{/home/username} (Linux),
 \code{/Users/username} (MacOS),
 and \code{C:/Users/} (windows). To install \pkg{GNU MCSim} in Windows, be sure to install Rtools first.
+The Rtools can install through installr::install.rtools()
 }
 \section{Functions}{
 \itemize{
+\item \code{mcsim_pkg}: Download and generate the portable MCSim into the package folder (no installation).
+The mod.exe program that is used to compile the model code will be generated after the file download.
+
 \item \code{mcsim_version}: Return the version number.
 }}
 

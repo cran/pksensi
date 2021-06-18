@@ -1,3 +1,9 @@
+# pksensi 1.2.1
+
+* Add `mcsim_pkg()` to download and run portable MCSim
+* Change the site location to https://nanhung.github.io
+* Improve coverage
+
 # pksensi 1.2.0
 
 * update the route to load example model
@@ -19,7 +25,7 @@
 
 # pksensi 1.1.5
 
-* `solve_mcsim()`: extense the flexible for the model in subfolder 
+* `solve_mcsim()`: extend the flexible for the model in subfolder 
 * Update the vignettes (add deSolve modeling example)
 
 # pksensi 1.1.4
