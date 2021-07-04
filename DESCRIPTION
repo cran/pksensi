@@ -1,7 +1,7 @@
 Package: pksensi
 Title: Global Sensitivity Analysis in Physiologically Based Kinetic
         Modeling
-Version: 1.2.1
+Version: 1.2.2
 Authors@R: 
     c(person(given = "Nan-Hung", 
              family = "Hsieh", 
@@ -30,7 +30,7 @@ URL: https://github.com/nanhung/pksensi,
 BugReports: https://github.com/nanhung/pksensi/issues
 Depends: R (>= 3.6)
 Imports: ggplot2, data.table, deSolve, dplyr, getPass, magrittr,
-        foreach, parallel, doParallel, reshape
+        foreach, parallel, doParallel, reshape2
 Suggests: covr, knitr, rmarkdown, testthat
 VignetteBuilder: knitr
 Encoding: UTF-8
@@ -38,10 +38,10 @@ LazyData: true
 RoxygenNote: 7.1.1
 Language: en-US
 NeedsCompilation: no
-Packaged: 2021-06-18 20:58:48 UTC; lanhsieh
+Packaged: 2021-07-04 18:04:40 UTC; nan-hunghsieh
 Author: Nan-Hung Hsieh [aut, cre] (<https://orcid.org/0000-0003-0163-2766>),
   Brad Reisfeld [ctb] (<https://orcid.org/0000-0003-1310-1495>),
   Weihsueh A. Chiu [ctb] (<https://orcid.org/0000-0002-7575-2368>)
 Maintainer: Nan-Hung Hsieh <d99622005@ntu.edu.tw>
 Repository: CRAN
-Date/Publication: 2021-06-18 21:50:01 UTC
+Date/Publication: 2021-07-04 18:40:02 UTC
