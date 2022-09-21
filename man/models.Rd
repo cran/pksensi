@@ -28,11 +28,11 @@ and acetaminophen pharmacokinetic model (Zurlinden et al. 2016).
 }
 \section{Functions}{
 \itemize{
-\item \code{pbtk1cpt_model}: Download pbtk1cpt.model file.
+\item \code{pbtk1cpt_model()}: Download pbtk1cpt.model file.
 
-\item \code{pbpk_apap_model}: Download pbpk_apap.model file.
+\item \code{pbpk_apap_model()}: Download pbpk_apap.model file.
+
 }}
-
 \examples{
 params <- c(F = 0.9, KA = 1.2, KE = 0.2, V = 1.5)
 t <- seq(0, 12, 0.1)
@@ -41,12 +41,14 @@ plot(t, C, type = "l", xlab = "time", ylab = "concentration")
 
 }
 \references{
-Pearce, R. G., Setzer, R. W., Strope, C. L., Wambaugh, J. F., & Sipes, N. S. (2017).
+Pearce, R. G., Setzer, R. W., Strope, C. L.,
+Wambaugh, J. F., & Sipes, N. S. (2017).
 httk: R package for high-throughput toxicokinetics.
 \emph{Journal of Statistical Software}, 79(4), 1-26.
 
 Zurlinden, T. J., & Reisfeld, B. (2016).
 Physiologically based modeling of the pharmacokinetics of acetaminophen and
 its major metabolites in humans using a Bayesian population approach.
-\emph{European journal of drug metabolism and pharmacokinetics}, 41(3), 267-280.
+\emph{European journal of drug metabolism and pharmacokinetics},
+41(3), 267-280.
 }

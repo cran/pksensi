@@ -12,7 +12,7 @@
 
 <meta name="author" content="Nan-Hung Hsieh" />
 
-<meta name="date" content="2021-07-04" />
+<meta name="date" content="2022-09-21" />
 
 <title>Acetaminophen-PBPK model</title>
 
@@ -26,6 +26,7 @@
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
     </style>
+
 
 
 <style type="text/css">
@@ -109,13 +110,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -163,7 +171,7 @@ div.csl-indent {
 
 <h1 class="title toc-ignore">Acetaminophen-PBPK model</h1>
 <h4 class="author">Nan-Hung Hsieh</h4>
-<h4 class="date">2021-07-04</h4>
+<h4 class="date">2022-09-21</h4>
 
 
 <div id="TOC">
@@ -180,7 +188,7 @@ div.csl-indent {
 </div>
 
 <p>The aim of this vignette is to reproduce our previous published <span class="citation">(Hsieh et al. 2018)</span> result of global sensitivity analysis for acetaminophen PBPK model through <strong>pksensi</strong>. The model codes are included in this package and can be generated through <code>pbpk_apap_model()</code>. We applied the global sensitivity analysis workflow to the original published model with 21 model parameters <span class="citation">(Zurlinden and Reisfeld 2016)</span>. The descriptions of each parameter and the sampling ranges are list in Table 1.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mcsim_install</span>(<span class="at">mxstep =</span> <span class="dv">5000</span>) <span class="co"># Be sure to set the mxstep to 5000</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mcsim_install</span>(<span class="at">version =</span> <span class="st">&quot;6.1.0&quot;</span>)</span></code></pre></div>
 <p>Same as the example of one-compartment PK model. The model parameter and the corresponding sampling range should be defined to create the parameter matrix. Previously, the probability distributions of model parameters were set to either truncated normal or uniform distribution when the parameters have informative prior information or not. To rapidly reach the acceptance convergence, we apply uniform distribution for all testing parameters. The ranges of informative parameters are set to 1.96-times difference for single side under log-scaled (approximate 54.6 times difference between minimum and maximum in natural scaled). The nominal values of informative model parameters were defined as:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Nominal value</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Tg <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="fl">0.23</span>)</span>
@@ -234,7 +242,7 @@ div.csl-indent {
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;OralExp_APAP = NDoses(2, 1, 0, 0, 0.001)&quot;</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;OralDose_APAP_mgkg = 20.0&quot;</span>)</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;lnCPL_APAP_mcgL&quot;</span>, <span class="st">&quot;lnCPL_AG_mcgL&quot;</span>, <span class="st">&quot;lnCPL_AS_mcgL&quot;</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="fl">0.1</span>, <span class="at">to =</span> <span class="fl">12.1</span>, <span class="at">by =</span> <span class="fl">0.2</span>)</span></code></pre></div>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">8</span>, <span class="dv">12</span>)</span></code></pre></div>
 </div>
 <div id="uncertainty-analysis" class="section level2">
 <h2>Uncertainty analysis</h2>

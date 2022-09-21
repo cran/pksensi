@@ -1,6 +1,15 @@
+# pksensi 1.2.3
+
+* Syntax update (check & install)
+* Fix bug (check)
+* Fix MCSim installation issue (#9)
+* Remove dependent: magrittr, reshape2
+* New function: `set_rtools40_path()`
+* Add feature to run simple simulation (`generate_infile()`)
+
 # pksensi 1.2.2
 
-* Add more flexible parallel method (`solve_mcsim`)
+* Add more flexible parallel method (`solve_mcsim()`)
 * Fix error in previous version
 
 # pksensi 1.2.1

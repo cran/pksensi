@@ -2,20 +2,20 @@
 % Please edit documentation in R/install.R
 \name{mcsim_install}
 \alias{mcsim_install}
-\alias{mcsim_pkg}
 \alias{mcsim_version}
+\alias{set_rtools40_path}
 \title{Download and install \pkg{GNU MCSim}}
 \usage{
-mcsim_install(version = "6.2.0", directory = NULL, mxstep = 5000)
-
-mcsim_pkg(version = "6.2.0")
+mcsim_install(version = "6.2.0", install_dir = NULL, mxstep = 5000)
 
 mcsim_version()
+
+set_rtools40_path()
 }
 \arguments{
 \item{version}{a character of version number.}
 
-\item{directory}{a character to assign the installed directory.}
+\item{install_dir}{a character to assign the installed directory.}
 
 \item{mxstep}{a numeric value to assign the maximum number of (internally defined) steps
 allowed during one call to the solver.}
@@ -25,7 +25,8 @@ Download the latest or specific version of \pkg{GNU MCSim} from the official web
 (\url{https://www.gnu.org/software/mcsim/}) and install it to the system directory.
 }
 \details{
-This function aims to help users download (source: https://ftp.gnu.org/gnu/mcsim/) and install \pkg{GNU MCSim} more easily.
+This function aims to help users download (source: https://ftp.gnu.org/gnu/mcsim/)
+and install \pkg{GNU MCSim} more easily.
 However, if you can not install it through this function.
 The additional way is to follow the instruction and install it manually:
 \url{https://www.gnu.org/software/mcsim/mcsim.html#Installation}
@@ -33,20 +34,20 @@ The additional way is to follow the instruction and install it manually:
 The default \code{mxstp} is setting to 5000.
 The user can increase \code{mxstp} to avoid possible error return.
 If you meet any error when conduct sensitivity analysis,
-you can this function to re-install \pkg{GNU MCSim} and set the higher \code{mxstp}.
+you can use this function to re-install \pkg{GNU MCSim} and set the higher \code{mxstp}.
 The default installed \code{directory} is under \code{/home/username} (Linux),
 \code{/Users/username} (MacOS),
-and \code{C:/Users/} (windows). To install \pkg{GNU MCSim} in Windows, be sure to install Rtools first.
-The Rtools can install through installr::install.rtools()
+and \code{C:/Users/username/Documents} (windows).
+To install \pkg{GNU MCSim} in Windows, be sure to install Rtools first.
+The current suggested Rtools version is 4.0.
 }
 \section{Functions}{
 \itemize{
-\item \code{mcsim_pkg}: Download and generate the portable MCSim into the package folder (no installation).
-The model generator program 'mod.exe' is used to compile the model code will be generated after the file download.
+\item \code{mcsim_version()}: Return the version number.
 
-\item \code{mcsim_version}: Return the version number.
+\item \code{set_rtools40_path()}: the function to set Rtools40 path
+
 }}
-
 \references{
 Bois, F. Y., & Maszle, D. R. (1997).
 MCSim: a Monte Carlo simulation program.

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Nan-Hung Hsieh" />
 
-<meta name="date" content="2021-07-04" />
+<meta name="date" content="2022-09-21" />
 
 <title>One-compartment PK model</title>
 
@@ -26,6 +26,7 @@
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
     </style>
+
 
 
 <style type="text/css">
@@ -109,13 +110,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -163,7 +171,7 @@ div.csl-indent {
 
 <h1 class="title toc-ignore">One-compartment PK model</h1>
 <h4 class="author">Nan-Hung Hsieh</h4>
-<h4 class="date">2021-07-04</h4>
+<h4 class="date">2022-09-21</h4>
 
 
 <div id="TOC">
@@ -283,8 +291,8 @@ div.csl-indent {
 <p>Here shows the relationship between the concentration of the rest of the body (<code>Ccompartment</code>) and the model parameters at times 0.01, 2.01, 6.01, and 24.01 hr (top to bottom), respectively. We can find that <code>kgutabs</code> and <code>vdist</code> have higher correlation with <code>Ccompartment</code> in the beginning (t = 0.01 h) of post-intake duration compared with other parameters, suggesting that the parameters have high impact on the modeling result. The <code>ke</code> shows a high correlation at the later time period (t = 24.01 h). The parameter <code>BW</code> does not show any obvious relationship with <code>Ccompartment</code>.</p>
 <p>The output variable <code>out</code> containing all the input arguments detailed above and the calculated SI of first order (<code>mSI</code>), interaction (<code>iSI</code>), and total order (<code>tSI</code>). Convergence indices are also stored in the list named <code>mCI</code>, <code>iCI</code>, and <code>tCI</code>. The outputs are formatted as 4-D array in <code>y</code> with the dimension name of model evaluation, number of replications, number of time points, and number of output variables, respectively.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(out<span class="sc">$</span>y)</span></code></pre></div>
-<p>Some functions in <strong>pksensi</strong> provide efficient ways to check the result from global SA. The <code>check()</code> can determine which parameters have relatively lowered sensitivity measurement across the given time points and model outputs, and therefore can be applied parameter fixing in model calibration. The <code>check()</code> also provides an argument to specify the target output or change the cut-off value. The argument of <code>SI.cutoff</code> set for example at 0.05, is used to detect the relative non-influential parameters as default, in this case representing a 5% change of the output is contributed from the specific parameter variation.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check</span>(out, <span class="at">SI.cutoff =</span> <span class="fl">0.05</span>)</span></code></pre></div>
+<p>Some functions in <strong>pksensi</strong> provide efficient ways to check the result from global SA. The <code>check()</code> can determine which parameters have relatively lowered sensitivity measurement across the given time points and model outputs, and therefore can be applied parameter fixing in model calibration. The <code>check()</code> also provides an argument to specify the target output or change the cut-off value. The argument of <code>cutoff</code> set for example at 0.05, is used to detect the relative non-influential parameters as default, in this case representing a 5% change of the output is contributed from the specific parameter variation.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">check</span>(out, <span class="at">cutoff =</span> <span class="fl">0.05</span>)</span></code></pre></div>
 <p>Based on the sensitivity measurement of the total order, the result shows that <code>BW</code> has a relative lower measurement of SI. However, all parameters do not converge to the setting cut-off, which means the larger sample size is required in further sensitivity testing. Similar to the <code>plot()</code> function that can assign specific output variable in the examination, the <code>check()</code> function can also use the assignment (<code>vars</code>) to examine a given output.</p>
 </div>
 <div id="gnu-mcsim-model-code" class="section level3">
@@ -326,7 +334,7 @@ div.csl-indent {
 <span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate parameter matrix</span></span>
 <span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rfast99</span>(params, <span class="at">n =</span> <span class="dv">200</span>, <span class="at">q =</span> q, <span class="at">q.arg =</span> q.arg, <span class="at">replicate =</span> <span class="dv">20</span>)</span></code></pre></div>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rfast99</span>(params, <span class="at">n =</span> <span class="dv">200</span>, <span class="at">q =</span> q, <span class="at">q.arg =</span> q.arg, <span class="at">replicate =</span> <span class="dv">10</span>)</span></code></pre></div>
 <p>Run simulation and check result.</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>outputs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Ccompartment&quot;</span>, <span class="st">&quot;Ametabolized&quot;</span>)</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">solve_fun</span>(x, <span class="at">time =</span> t, <span class="at">initState =</span> initState, <span class="at">outnames =</span> outputs, <span class="at">dllname =</span> mName)</span>

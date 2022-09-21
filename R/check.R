@@ -13,8 +13,8 @@
 #' @param order a vector of the interested output index, including \code{first order}, \code{interaction}, and \code{total order}.
 #' @param vars a logical value or character to specify the display variable in simulation.
 #' @param times a logical value or character to specify the display time in simulation.
-#' @param SI.cutoff a value or vector to set the cut-off for sensitivity index. The default is 0.05.
-#' @param CI.cutoff a value or vector to set the cut-off for convergence index. The default is 0.05.
+#' @param cutoff a value or vector to set the cut-off for sensitivity (or convergence) index.
+#' The default is 0.05 and 0.1.
 #' @param index a character to choose sensitivity index \code{SI} (default) or convergence index \code{CI}.
 #' @param level a logical value to use continuous or discrete (default) output.
 #' @param text a logical value to display the calculated indices in the plot.
@@ -22,20 +22,18 @@
 #' @param show.all a logical value to show all testing parameters in the heatmap. The default is set to \code{FALSE} to show only the influential parameters.
 #' @param ... additional arguments to customize the graphical parameters.
 #'
-#' @importFrom reshape2 melt
-#' @importFrom magrittr %>%
+#' @importFrom data.table as.data.table
 #' @importFrom stats time
 #' @importFrom grDevices colorRampPalette
 #' @importFrom graphics barplot legend lines par abline plot.new
 #' @importFrom stats runif fft
 #' @import ggplot2
-#' @import dplyr
 #'
 #' @return The \code{print} function returns sensitivity and convergence indices
 #' with given time-step in the console. The \code{check} method provides the summary of
-#' parameter sensitivity and convergence according to the given \code{SI.cutoff} and \code{CI.cutoff}.
+#' parameter sensitivity and convergence according to the given \code{cutoff}.
 #' It can distinguish the influential and non-influential parameter by the providing value
-#' of \code{SI.cutoff}. The \code{plot} function can generate the
+#' of \code{cutoff}. The \code{plot} function can generate the
 #' time-course functional outputs of first order and interaction indices for each parameter.
 #' The default output is the first model variable. The \code{heat_check} provides a convenient way
 #' to visualize and distinguish the influential and non-influential parameter by the setting cut-off.
@@ -64,7 +62,7 @@
 #' set.seed(1234)
 #' x <- rfast99(params = params, n = 200, q = q, q.arg = q.arg, rep = 20)
 #'
-#' time <- seq(from = 0.25, to = 12.25, by = 0.5)
+#' time <- c(0.25, 0.5, 1, 2, 4, 6, 8, 12, 24)
 #' out <- solve_fun(x, model = FFPK, time = time, vars = "output")
 #'
 #'
@@ -78,13 +76,16 @@
 #'
 #' @rdname check
 #' @export
-check <- function(x, times, vars, SI.cutoff, CI.cutoff, out) UseMethod("check")
+check <- function(x, times, vars, cutoff, out) UseMethod("check")
 
 #' @method check rfast99
 #' @export
-check.rfast99 <- function(x, times = NULL, vars = NULL, SI.cutoff = 0.05, CI.cutoff = 0.05, out = TRUE){
+check.rfast99 <- function(x, times = NULL, vars = NULL, cutoff = 0.05, out = TRUE){
 
-  if (is.null(times)) times <- dimnames(x$y)[[3]]
+  SI.cutoff <- CI.cutoff <- cutoff
+
+  if (is.null(times)) times <- dimnames(x$y)[[3]] else
+    times <- as.character(times)
   if (is.null(vars)) vars <- dimnames(x$y)[[4]]
 
   if (length(times) == 1 && length(vars) == 1) {
@@ -160,40 +161,55 @@ check.rfast99 <- function(x, times = NULL, vars = NULL, SI.cutoff = 0.05, CI.cut
 heat_check <- function(x,
                        order = c("first order", "interaction", "total order"),
                        vars = NULL, times = NULL,
-                       SI.cutoff = c(0.05, 0.1), CI.cutoff = c(0.05, 0.1),
-                       index = "SI", level = T, text = F, show.all = FALSE){
-
-  nSI <- length(SI.cutoff)
-  SI.labels<-rep(NA, nSI+1)
-
-  for(i in 1:nSI){
-    SI.labels[i+1] <- paste0(SI.cutoff[i]," - ",SI.cutoff[i+1])
-  }
-  SI.labels[1] <- paste0("0 - ", SI.cutoff[1])
-  SI.labels[nSI+1] <- paste0(" > ", SI.cutoff[nSI])
-
-  nCI <- length(CI.cutoff)
-  CI.labels<-rep(NA, nCI+1)
-
-  for(i in 1:nCI){
-    CI.labels[i+1] <- paste0(CI.cutoff[i]," - ",CI.cutoff[i+1])
-  }
-  CI.labels[1] <- paste0("0 - ", CI.cutoff[1])
-  CI.labels[nCI+1] <- paste0(" > ", CI.cutoff[nCI])
+                       index = "SI", cutoff = c(0.05, 0.1),
+                       level = T, text = F, show.all = FALSE){
 
   if (index ==  "SI"){
-    X <- tidy_index(x, index = index) %>%
-      mutate(level = cut(.data$value, breaks=c(-Inf, paste(SI.cutoff), Inf), labels=SI.labels))
+    SI.cutoff <- cutoff
+    nSI <- length(SI.cutoff)
+    SI.labels<-rep(NA, nSI+1)
+
+    for(i in 1:nSI){
+      SI.labels[i+1] <- paste0(SI.cutoff[i]," - ",SI.cutoff[i+1])
+    }
+    SI.labels[1] <- paste0("0 - ", SI.cutoff[1])
+    SI.labels[nSI+1] <- paste0(" > ", SI.cutoff[nSI])
+  }
+
+  if (index ==  "CI"){
+    CI.cutoff <- cutoff
+    nCI <- length(CI.cutoff)
+    CI.labels<-rep(NA, nCI+1)
+
+    for(i in 1:nCI){
+      CI.labels[i+1] <- paste0(CI.cutoff[i]," - ",CI.cutoff[i+1])
+    }
+    CI.labels[1] <- paste0("0 - ", CI.cutoff[1])
+    CI.labels[nCI+1] <- paste0(" > ", CI.cutoff[nCI])
+  }
+
+
+  if (index ==  "SI"){
+    X_index <- tidy_index(x, index = index)
+    X <- cbind(X_index,
+               cut(X_index$value, breaks=c(-Inf, paste(SI.cutoff), Inf), labels=SI.labels))
+    names(X)[6] <- "level"
 
     if (!(show.all == TRUE)) {
-      check.out <- check.rfast99(x, vars = vars, SI.cutoff = min(SI.cutoff), out = F)
-      X <- X %>% filter(.data$parameter %in% check.out$tSI)
-      message(paste0("Display ", length(check.out$tSI), " influential parameters from all ", dim(x$a)[3], " examined parameters."))
+      check.out <- check.rfast99(x, vars = vars, times, cutoff = min(SI.cutoff), out = F)
+
+      X <- X[X$parameter %in% check.out$tSI, ]
+
+      message(paste0("Display ", length(check.out$tSI),
+                     " influential parameters from all ",
+                     dim(x$a)[3], " examined parameters."))
     }
 
   } else if ((index == "CI")) {
-    X <- tidy_index(x, index = index) %>%
-      mutate(level = cut(.data$value, breaks=c(-Inf, paste(CI.cutoff), Inf), labels=CI.labels))
+    X_index <- tidy_index(x, index = index)
+    X <- cbind(X_index,
+               cut(X_index$value, breaks=c(-Inf, paste(CI.cutoff), Inf), labels=CI.labels))
+    names(X)[6] <- "level"
   }
 
   colfunc <- colorRampPalette(c("red", "grey90"))
@@ -213,12 +229,15 @@ heat_check <- function(x,
     times <- dimnames(x$y)[[3]]
   } else (times <- times)
 
+  odr <- order
+  variable <- vars
+  X <- subset(X, order %in% odr & variable %in% vars & time %in% times)
 
-  X <- X %>% filter(order %in% !!(order)) %>% filter(.data$variable %in% vars) %>% filter(time %in% times)
-
-  if(length(times) < 16){
-    X$time <- as.factor(X$time)
-  }
+  #if(length(times) < 16){
+  #  X$time <- as.factor(X$time)
+  #}
+  X$time <- as.factor(X$time)
+  X$time <- factor(X$time, levels = times)
 
   #if (order == F){
   p <- ggplot(X, aes_string("time", "parameter"))
@@ -234,9 +253,9 @@ heat_check <- function(x,
       scale_fill_gradient(low = "white", high = "red", limits = c(-0.05,1.05))
   }
 
-  if(length(times) < 16){
-    p <- p + scale_x_discrete(expand=c(0,0))
-  } else p <- p + scale_x_continuous(expand=c(0,0))
+  p <- p + scale_x_discrete(expand=c(0,0))
+  #if(length(times) < 16) p <- p + scale_x_discrete(expand=c(0,0)) else
+  #  p <- p + scale_x_continuous(expand=c(0,0))
 
   if (length(order) == 1){
     p <- p + scale_y_discrete(expand=c(0,0)) +
@@ -270,14 +289,14 @@ heat_check <- function(x,
 tidy_index <- function (x, index = "SI") {
 
   if(index == "CI") {
-    m <- reshape2::melt(x$mCI) %>% cbind(order = "first order")
-    i <- reshape2::melt(x$iCI) %>% cbind(order = "interaction")
-    t <- reshape2::melt(x$tCI) %>% cbind(order = "total order")
+    m <- as.data.table(x$mCI) |> cbind(order = "first order")
+    i <- as.data.table(x$iCI) |> cbind(order = "interaction")
+    t <- as.data.table(x$tCI) |> cbind(order = "total order")
     X <- do.call(rbind, list(m, i, t))
   } else if (index == "SI") {
-    m <- reshape2::melt(x$mSI) %>% cbind(order = "first order")
-    i <- reshape2::melt(x$iSI) %>% cbind(order = "interaction")
-    t <- reshape2::melt(x$tSI) %>% cbind(order = "total order")
+    m <- as.data.table(x$mSI) |> cbind(order = "first order")
+    i <- as.data.table(x$iSI) |> cbind(order = "interaction")
+    t <- as.data.table(x$tSI) |> cbind(order = "total order")
     X <- do.call(rbind, list(m, i, t))
   }
   names(X) <- c("time", "parameter", "variable", "value", "order")
@@ -287,7 +306,7 @@ tidy_index <- function (x, index = "SI") {
 #' @rdname check
 #' @method plot rfast99
 #' @export
-plot.rfast99 <- function(x, vars = 1, SI.cutoff = 0.1, ...){
+plot.rfast99 <- function(x, vars = 1, cutoff = 0.1, ...){
 
   mSI <- x$mSI[,,vars]
   iSI <- x$tSI[,,vars]
@@ -322,12 +341,12 @@ plot.rfast99 <- function(x, vars = 1, SI.cutoff = 0.1, ...){
       polygon(x = c(times, rev(times)),
               y =c(mSI[,i]-mCI[,i], rev(mSI[,i]+mCI[,i])),
               col = col.transp, border = col.transp)
-      if (is.numeric(SI.cutoff)){
-        abline(SI.cutoff, 0, lty = 2)
+      if (is.numeric(cutoff)){
+        abline(cutoff, 0, lty = 2)
       }
     }
 
-    if (class(vars) == "character") {vars <- which(dimnames(x$y)[[4]] == vars)}
+    if (is.character(vars)) {vars <- which(dimnames(x$y)[[4]] == vars)}
 
     variable <- dimnames(x$y)[[4]][vars]
     mtext(variable, NORTH<-3, line=0.4, adj=0, cex=1.5, outer=TRUE)

@@ -1,6 +1,6 @@
 ## ----setup, include = FALSE---------------------------------------------------
 library(pksensi)
-#mcsim_install()
+#mcsim_install(version = "6.1.0")
 
 knitr::opts_chunk$set(
   eval = F,
@@ -111,7 +111,7 @@ knitr::opts_chunk$set(
 #  dim(out$y)
 
 ## -----------------------------------------------------------------------------
-#  check(out, SI.cutoff = 0.05)
+#  check(out, cutoff = 0.05)
 
 ## -----------------------------------------------------------------------------
 #  pbtk1cpt_model()
@@ -162,7 +162,7 @@ knitr::opts_chunk$set(
 #  
 #  # Generate parameter matrix
 #  set.seed(1234)
-#  x <- rfast99(params, n = 200, q = q, q.arg = q.arg, replicate = 20)
+#  x <- rfast99(params, n = 200, q = q, q.arg = q.arg, replicate = 10)
 
 ## -----------------------------------------------------------------------------
 #  outputs <- c("Ccompartment", "Ametabolized")

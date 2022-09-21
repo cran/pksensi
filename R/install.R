@@ -3,7 +3,8 @@
 #' Download the latest or specific version of \pkg{GNU MCSim} from the official website
 #' (\url{https://www.gnu.org/software/mcsim/}) and install it to the system directory.
 #'
-#' This function aims to help users download (source: https://ftp.gnu.org/gnu/mcsim/) and install \pkg{GNU MCSim} more easily.
+#' This function aims to help users download (source: https://ftp.gnu.org/gnu/mcsim/)
+#' and install \pkg{GNU MCSim} more easily.
 #' However, if you can not install it through this function.
 #' The additional way is to follow the instruction and install it manually:
 #' \url{https://www.gnu.org/software/mcsim/mcsim.html#Installation}
@@ -11,11 +12,12 @@
 #' The default \code{mxstp} is setting to 5000.
 #' The user can increase \code{mxstp} to avoid possible error return.
 #' If you meet any error when conduct sensitivity analysis,
-#' you can this function to re-install \pkg{GNU MCSim} and set the higher \code{mxstp}.
+#' you can use this function to re-install \pkg{GNU MCSim} and set the higher \code{mxstp}.
 #' The default installed \code{directory} is under \code{/home/username} (Linux),
 #' \code{/Users/username} (MacOS),
-#' and \code{C:/Users/} (windows). To install \pkg{GNU MCSim} in Windows, be sure to install Rtools first.
-#' The Rtools can install through installr::install.rtools()
+#' and \code{C:/Users/username/Documents} (windows).
+#' To install \pkg{GNU MCSim} in Windows, be sure to install Rtools first.
+#' The current suggested Rtools version is 4.0.
 #'
 #' @references
 #' Bois, F. Y., & Maszle, D. R. (1997).
@@ -23,11 +25,10 @@
 #' \emph{Journal of Statistical Software}, 2(9): 1–60.
 #'
 #' @param version a character of version number.
-#' @param directory a character to assign the installed directory.
+#' @param install_dir a character to assign the installed directory.
 #' @param mxstep a numeric value to assign the maximum number of (internally defined) steps
 #' allowed during one call to the solver.
 #'
-#' @import getPass
 #' @importFrom utils download.file
 #'
 #' @references \url{https://www.gnu.org/software/mcsim/}
@@ -35,45 +36,54 @@
 #' @rdname mcsim
 #'
 #' @export
-mcsim_install <- function(version = "6.2.0", directory = NULL, mxstep = 5000) {
+mcsim_install <- function(version = "6.2.0", install_dir = NULL, mxstep = 5000) {
+
+  if (Sys.info()[['sysname']] == "Windows") {
+    if(Sys.which("gcc") == "") stop("Please check the installation of Rtools.")
+  } else if (Sys.info()[['sysname']] == "Linux") {
+    if(Sys.which("gcc") == "") stop("Please check the installation of gcc.")
+  }
 
   message("Start install")
   version<-version
   URL <- sprintf('http://ftp.gnu.org/gnu/mcsim/mcsim-%s.tar.gz', version)
   tf <- tempfile()
-  download.file(URL, tf, mode = "wb")
+  download.file(URL, tf, mode = 'wb')
 
   name <- Sys.info()[['user']]
+  home_dir <- Sys.getenv("HOME")
 
-  if (is.null(directory)){
+  # Defined directory (exdir) to place mcsim source code
+  if (is.null(install_dir)){
     if (Sys.info()[['sysname']] == "Darwin"){
       exdir <- paste0("/Users/", name)
     } else if (Sys.info()[['sysname']] == "Linux") {
       exdir <- paste0("/home/", name)
     } else if (Sys.info()[['sysname']] == "Windows") {
-      exdir <- paste0("c:/Users/", name)
+      exdir <- home_dir
     }
-  } else {exdir <- directory}
+  } else {exdir <- install_dir}
 
   utils::untar(tf, exdir = exdir)
 
-  current.wd <- getwd()
+  current.wd <- getwd() # the current working directory
 
-  if (is.null(directory)){
+  # Defined MCSim directory
+  if (is.null(install_dir)){
     if (Sys.info()[['sysname']] == "Darwin"){
       setwd(paste0("/Users/", name, sprintf('/mcsim-%s', version)))
 
       # The MacOS used clang as default compiler, the following command is used to switch to GCC
-      Sys.setenv(PATH = paste("/usr/local/bin", Sys.getenv("PATH"), sep=";"))
+      Sys.setenv(PATH = paste("/usr/local/bin", Sys.getenv("PATH"), sep=":"))
 
     } else if (Sys.info()[['sysname']] == "Linux") {
       setwd(paste0("/home/", name, sprintf('/mcsim-%s', version)))
     } else if (Sys.info()[['sysname']] == "Windows") {
-      setwd(paste0("c:/Users/", name, sprintf('/mcsim-%s', version)))
+      setwd(paste0(home_dir, sprintf('/mcsim-%s', version)))
     }
-  } else {setwd(paste0(directory, sprintf('/mcsim-%s', version)))}
+  } else {setwd(paste0(install_dir, sprintf('/mcsim-%s', version)))}
 
-  mcsim.directory <-getwd()
+  mcsim.directory <- getwd()
 
   if (mxstep != 500){
     file <- paste0(getwd(), "/sim/lsodes1.c")
@@ -83,86 +93,89 @@ mcsim_install <- function(version = "6.2.0", directory = NULL, mxstep = 5000) {
     cat(mxstp0, file=file, sep="\n")
   }
 
+  # Defined mcsim directory to place compiled files (e.g., bin, lib, etc)
   if (.Platform$OS.type == "unix"){
-    system("./configure")
+
+    if (is.null(install_dir)) mcsim_dir <- paste0(home_dir, "/mcsim") else
+      mcsim_dir <- paste0(install_dir, "/mcsim")
+    if(!dir.exists(mcsim_dir)) dir.create(mcsim_dir)
+
+    system(paste0("./configure prefix=", mcsim_dir))
     system("make")
+    system("make install")
     system("make check")
 
-    input <- getPass::getPass("Authentication is required to install MCSim (Password): ")
+    bin_path <- paste0(mcsim_dir, "/bin")
+    Sys.setenv(PATH = paste(bin_path, Sys.getenv("PATH"), sep=":"))
+    lib_path <- paste0(mcsim_dir, "/lib")
+    Sys.setenv(LD_LIBRARY_PATH = paste(lib_path,
+                                       Sys.getenv("LD_LIBRARY_PATH"), sep=":"))
 
-    if (Sys.info()[['sysname']] == "Darwin"){
-      system("sudo -kS make install", input=input)
-    } else if (Sys.info()[['sysname']] == "Linux"){
-      system("sudo -kS sh -c 'make install; ldconfig'", input=input)
-    }
+    message("\nChecking...")
+    cat(Sys.which("makemcsim"))
+
+    makemcsim <- paste0(bin_path, "/makemcsim")
+    if(Sys.which("makemcsim") == makemcsim)
+      message(paste0("\nThe MCSim " , sprintf('%s', version), " is installed."))
+      message(paste0("The sourced folder is under ", mcsim.directory))
+
   } else if (.Platform$OS.type == "windows") {
 
     if(Sys.which("gcc") == ""){ # echo $PATH
+      # Suggest use Rtools40
       PATH = "C:\\rtools40\\mingw64\\bin; C:\\rtools40\\usr\\bin"
       Sys.setenv(PATH = paste(PATH, Sys.getenv("PATH"), sep=";"))
+
     } # PATH=$PATH:/c/Rtools/mingw_32/bin; export PATH
 
     setwd(paste0(mcsim.directory,"/mod"))
     generate_config.h()
-    setwd(paste0(mcsim.directory,"/sim"))
+
+    mcsim_sim <- paste0(mcsim.directory,"/sim")
+    setwd(mcsim_sim)
     generate_config.h()
-    setwd(mcsim.directory)
-    system(paste0("gcc -o ./mod/mod.exe ./mod/*.c"))
-    if(file.exists("./mod/mod.exe")){
-      cat(paste0("Created 'mod.exe'"))
+    sim_files <- list.files(mcsim_sim)
+
+    # Create 'mcsim' directory
+    if (is.null(install_dir)) {
+      mcsim_dir <- paste0(home_dir, "/mcsim")
+    } else mcsim_dir <- paste0(install_dir, "/mcsim")
+
+    # Remove the previous installed version
+    if(dir.exists(mcsim_dir)) {
+      system(paste0("rm -rf ", mcsim_dir))
+    #  if (menu(c("Yes", "No"),
+    #           title = paste0("\nThe 'mcsim' directory is existed. ",
+    #                          "Do you want to replace it?")) == 1)
+    #    system(paste0("rm -rf ", mcsim_dir))
+    #  else return(invisible())
     }
+
+    dir.create(mcsim_dir)
+
+    mcsim_sim_dir <- paste0(mcsim_dir, "/sim")
+    if(!dir.exists(mcsim_sim_dir)) dir.create(mcsim_sim_dir)
+
+
+    file.copy(from = paste0(mcsim_sim, "/", sim_files),
+              to = paste0(mcsim_sim_dir, "/", sim_files))
+    setwd(mcsim.directory)
+
+    mod <- paste0(mcsim_dir, "/mod.exe")
+    system(paste0("gcc -o ",  mod, " ./mod/*.c"))
+    Sys.setenv(PATH = paste(mcsim_dir, Sys.getenv("PATH"), sep=";"))
+
+    message("\nChecking...")
+    cat(Sys.which("mod"))
+
+    if(file.exists(mod)){
+      message(paste0("\nThe MCSim " , sprintf('%s', version), " is installed."))
+      message(paste0("The sourced folder is under ", mcsim.directory))
+    } else stop("Cannot find mod.exe.")
+
   }
   cat("\n")
-  message(paste0("The MCSim " , sprintf('%s', version), " is installed. The sourced folder is under ", mcsim.directory))
   setwd(current.wd)
-}
-
-#' @export
-#' @describeIn mcsim Download and generate the portable MCSim into the package folder (no installation).
-#' The model generator program 'mod.exe' is used to compile the model code will be generated after the file download.
-# The function can only use for version greater than 5.3.0.
-mcsim_pkg <- function(version = "6.2.0"){
-
-  current_wd <- getwd()
-  mcsim_directory <- system.file("mcsim", package = "pksensi")
-  mcsim_wd <- setwd(mcsim_directory)
-
-  files_before <- list.files()
-
-  message("Start install")
-  version <- version
-  URL <- sprintf('http://ftp.gnu.org/gnu/mcsim/mcsim-%s.tar.gz', version)
-  tf <- tempfile()
-  download.file(URL, tf, mode = "wb")
-  utils::untar(tf)
-
-  files_after <- list.files()
-
-  file_name <- setdiff(files_after, files_before)
-  if(file_name == "mcsim") file.rename("mcsim", paste0("mcsim-", version))
-
-
-  if (Sys.info()[['sysname']] == "Windows") {
-    if(Sys.which("gcc") == ""){ # echo $PATH
-      PATH = "C:\\rtools40\\mingw64\\bin; C:\\rtools40\\usr\\bin"
-      Sys.setenv(PATH = paste(PATH, Sys.getenv("PATH"), sep=";"))
-    } # PATH=$PATH:/c/Rtools/mingw_32/bin; export PATH
-  } # PATH=$PATH:/c/MinGW/msys/1.0/local/bin
-
-
-  setwd(paste0(mcsim_directory, "/mcsim-", version, "/mod"))
-  generate_config.h()
-  system(paste0("gcc -o ./mod.exe *.c"))
-  if(file.exists("mod.exe")){
-    cat(paste0("Created model generator program 'mod.exe'\n"))
-    message(paste0("The MCSim " , sprintf('%s', version), " is downloaded. The sourced folder is under ", mcsim_directory, "\n"))
-  } else
-    message(paste0("The MCSim " , sprintf('%s', version), " is downloaded; But have problem to generate model generator program 'mod.exe'\n"))
-
-  setwd(paste0(mcsim_directory, "/mcsim-", version, "/sim"))
-  generate_config.h()
-  setwd(current_wd)
-  cat("\n")
 }
 
 #' @export
@@ -186,10 +199,26 @@ mcsim_version <- function(){
     exdir <- paste0("c:/Users/", name)
     l <- list.files(path = exdir)
     version <- l[grep("mcsim", l)]
-    if (class(version) == "character"){
+    if (is.character(version)){
       message("The '", version, "' is found in ", exdir)
     }
   }
+}
+
+#' @export
+#' @describeIn mcsim the function to set Rtools40 path
+set_rtools40_path <- function(){
+
+  if (.Platform$OS.type == "windows"){
+    PATH = "C:\\rtools40\\mingw64\\bin; C:\\rtools40\\usr\\bin"
+    Sys.setenv(PATH = paste(PATH, Sys.getenv("PATH"), sep=";"))
+
+    env.file <- ".Renviron"
+    if (!file.exists(env.file)) file.create(env.file)
+    path <- 'PATH="${RTOOLS40_HOME}\\usr\\bin;${RTOOLS40_HOME}\\mingw64\\bin;${PATH}"'
+    write(path, file = paste0(getwd(), "/.Renviron"), append = TRUE)
+  } else stop("You are not using Windows OS")
+
 }
 
 generate_config.h <- function(){
@@ -222,4 +251,32 @@ generate_config.h <- function(){
       "#define HAVE_UNISTD_H 1 \n",
       file = "config.h",
       sep = "")
+}
+
+set_permanent_path <- function(mcsim_dir=NULL){
+
+  if (.Platform$OS.type == "unix"){
+
+    if (Sys.getenv("SHELL")=="/usr/bin/zsh"){
+      zshrc <- paste0(Sys.getenv("HOME"), "/.zshrc")
+      cat('\n# Path to MCSim\n',
+          file = zshrc, append=TRUE)
+      if (is.null(mcsim_dir)){
+        cat('export PATH=$PATH:$HOME/mcsim/bin',
+            file = zshrc, append=TRUE)
+      } else cat(paste0('export PATH=$PATH:', mcsim_dir, '/mcsim/bin'),
+                 file = zshrc, append=TRUE)
+      message(paste0("Done. Please check the .zshrc file at ", zshrc))
+      } else if (Sys.getenv("SHELL")=="/bin/bash") {
+        bashrc <- paste0(Sys.getenv("HOME"), "/.bashrc")
+        cat('\n# Path to MCSim\n',
+            file = bashrc, append=TRUE)
+        if (is.null(mcsim_dir)){
+          cat('export PATH=$PATH:$HOME/mcsim/bin',
+              file = bashrc, append=TRUE)
+        } else cat(paste0('export PATH=$PATH:', mcsim_dir, '/mcsim/bin'),
+                   file = bashrc, append=TRUE)
+        message(paste0("Done. Please check the .bashrc file at ", zshrc))
+        }
+  } else stop("The function is design for 'unix' system")
 }

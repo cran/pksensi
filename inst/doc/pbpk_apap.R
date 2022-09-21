@@ -1,6 +1,6 @@
 ## ----setup, include = FALSE---------------------------------------------------
 library(pksensi)
-#mcsim_install()
+#mcsim_install(version = "6.1.0")
 
 knitr::opts_chunk$set(
   eval = F,
@@ -12,6 +12,9 @@ knitr::opts_chunk$set(
   fig.height = 4,
   comment = "#>"
 )
+
+## -----------------------------------------------------------------------------
+#  mcsim_install(version = "6.1.0")
 
 ## ---- echo=F------------------------------------------------------------------
 #  #Nominal value
@@ -130,7 +133,7 @@ knitr::opts_chunk$set(
 #                  "OralExp_APAP = NDoses(2, 1, 0, 0, 0.001)",
 #                  "OralDose_APAP_mgkg = 20.0")
 #  vars <- c("lnCPL_APAP_mcgL", "lnCPL_AG_mcgL", "lnCPL_AS_mcgL")
-#  times <- seq(from = 0.1, to = 12.1, by = 0.2)
+#  times <- seq(0.1, 0.5, 1, 2, 3, 4, 6, 8, 12)
 
 ## -----------------------------------------------------------------------------
 #  head(APAP)
